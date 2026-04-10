@@ -1,8 +1,22 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+C_BLUE='\033[1;34m'
+C_CYAN='\033[1;36m'
+C_GREEN='\033[1;32m'
+C_PURPLE='\033[1;35m'
+C_YELLOW='\033[1;33m'
+C_RED='\033[1;31m'
+C_RESET='\033[0m'
+C_BOLD='\033[1m'
+
+info() { echo -e "${C_CYAN}[i]${C_RESET} $1"; }
+success() { echo -e "${C_GREEN}[✓]${C_RESET} $1"; }
+error() { echo -e "${C_RED}[✗]${C_RESET} $1"; }
+warn() { echo -e "${C_YELLOW}[!]${C_RESET} $1"; }
+
 if [ "${EUID:-0}" -ne 0 ]; then
-  echo "Run as root: sudo -i"
+  error "Run as root: sudo -i"
   exit 1
 fi
 
@@ -19,43 +33,43 @@ JWT_SECRET=""
 ADMIN_TOKEN=""
 
 prompt() {
-  local label="$1"
+  local label="${C_PURPLE}[?]${C_RESET} $1"
   local def="${2:-}"
   local v
   if [ -n "$def" ]; then
     if [ -r /dev/tty ]; then
-      read -r -p "${label} [${def}]: " v </dev/tty || v=""
+      read -r -p "$(echo -e "${label} [${C_BOLD}${def}${C_RESET}]: ")" v </dev/tty || v=""
     else
-      read -r -p "${label} [${def}]: " v || v=""
+      read -r -p "$(echo -e "${label} [${C_BOLD}${def}${C_RESET}]: ")" v || v=""
     fi
     if [ -z "$v" ]; then v="$def"; fi
   else
     if [ -r /dev/tty ]; then
-      read -r -p "${label}: " v </dev/tty || v=""
+      read -r -p "$(echo -e "${label}: ")" v </dev/tty || v=""
     else
-      read -r -p "${label}: " v || v=""
+      read -r -p "$(echo -e "${label}: ")" v || v=""
     fi
   fi
   printf "%s" "$v"
 }
 
 confirm() {
-  local label="$1"
+  local label="${C_PURPLE}[?]${C_RESET} $1"
   local def="${2:-y}"
   local v
   while true; do
     if [ "$def" = "y" ]; then
       if [ -r /dev/tty ]; then
-        read -r -p "${label} [Y/n]: " v </dev/tty || v=""
+        read -r -p "$(echo -e "${label} [${C_BOLD}Y${C_RESET}/n]: ")" v </dev/tty || v=""
       else
-        read -r -p "${label} [Y/n]: " v || v=""
+        read -r -p "$(echo -e "${label} [${C_BOLD}Y${C_RESET}/n]: ")" v || v=""
       fi
       v="${v:-y}"
     else
       if [ -r /dev/tty ]; then
-        read -r -p "${label} [y/N]: " v </dev/tty || v=""
+        read -r -p "$(echo -e "${label} [y/${C_BOLD}N${C_RESET}]: ")" v </dev/tty || v=""
       else
-        read -r -p "${label} [y/N]: " v || v=""
+        read -r -p "$(echo -e "${label} [y/${C_BOLD}N${C_RESET}]: ")" v || v=""
       fi
       v="${v:-n}"
     fi
@@ -75,10 +89,22 @@ rand_hex() {
   fi
 }
 
-echo "Kivana Server Setup"
-echo
+banner() {
+  echo -e "${C_CYAN}"
+  echo '    _  __ _                             '
+  echo '   | |/ /(_)__   __ __ _  _ __    __ _  '
+  echo '   | '\'' / | |\ \ / // _` || '\''_ \  / _` | '
+  echo '   | . \ | | \ V /| (_| || | | || (_| | '
+  echo '   |_|\_\|_|  \_/  \__,_||_| |_| \__,_| '
+  echo -e "${C_RESET}"
+  echo -e "   ${C_BOLD}Server Edition${C_RESET} ${C_PURPLE}v0.2.2${C_RESET}"
+  echo
+}
+
+banner
 
 if [ -r /dev/tty ]; then
+  info "Starting interactive setup..."
   REPO_URL="$(prompt "GitHub repo URL" "$REPO_URL_DEFAULT")"
   BASE_DIR="$(prompt "Install base dir" "$BASE_DIR_DEFAULT")"
   HTTP_PORT="$(prompt "HTTP port" "8080")"
@@ -87,23 +113,23 @@ if [ -r /dev/tty ]; then
   JWT_SECRET="$(prompt "JWT secret (leave blank to auto-generate)" "")"
   ADMIN_TOKEN="$(prompt "Admin token (leave blank to auto-generate)" "")"
 else
-  echo "No TTY detected. Using defaults (non-interactive)."
-  echo "Tip: run without piping for prompts: curl -fsSLO <url> && bash setup-wizard.sh"
+  warn "No TTY detected. Using defaults (non-interactive)."
+  info "Tip: run without piping for prompts: curl -fsSLO <url> && bash setup-wizard.sh"
 fi
 
 if [ -z "$POSTGRES_PASSWORD" ]; then
   POSTGRES_PASSWORD="$(rand_hex 24)"
-  echo "Generated Postgres password."
+  success "Generated Postgres password."
 fi
 
 if [ -z "$JWT_SECRET" ]; then
   JWT_SECRET="$(rand_hex 48)"
-  echo "Generated JWT secret."
+  success "Generated JWT secret."
 fi
 
 if [ -z "$ADMIN_TOKEN" ]; then
   ADMIN_TOKEN="$(rand_hex 24)"
-  echo "Generated admin token."
+  success "Generated admin token."
 fi
 
 REPO_DIR="${BASE_DIR}/Kivana-server"
@@ -114,13 +140,15 @@ if ! command -v git >/dev/null 2>&1; then
     apt-get update -y
     apt-get install -y git
   else
-    echo "git is required."
+    error "git is required."
     exit 1
   fi
 fi
 
 if ! command -v docker >/dev/null 2>&1; then
-  if confirm "Docker not found. Install Docker + Compose?" y; then
+  warn "Docker not found."
+  if confirm "Install Docker + Compose?" y; then
+    info "Installing Docker..."
     apt-get update -y
     apt-get install -y ca-certificates curl
     install -m 0755 -d /etc/apt/keyrings
@@ -129,8 +157,9 @@ if ! command -v docker >/dev/null 2>&1; then
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo ${VERSION_CODENAME}) stable" > /etc/apt/sources.list.d/docker.list
     apt-get update -y
     apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    success "Docker installed."
   else
-    echo "Docker is required for the easy deploy."
+    error "Docker is required for the easy deploy."
     exit 1
   fi
 fi
@@ -139,15 +168,19 @@ mkdir -p "$BASE_DIR"
 if [ -d "$REPO_DIR/.git" ]; then
   cd "$REPO_DIR"
   if confirm "Repo exists. Pull latest changes?" y; then
+    info "Pulling latest changes..."
     git pull
+    success "Updated."
   fi
 else
+  info "Cloning repo..."
   git clone "$REPO_URL" "$REPO_DIR"
+  success "Cloned."
 fi
 
 cd "$API_DIR"
 
-cat > .env <<EOF
+info "Writing .env file..."
 DATABASE_URL=postgres://kivana:${POSTGRES_PASSWORD}@db:5432/kivana
 JWT_SECRET=${JWT_SECRET}
 ACCESS_TOKEN_TTL_SECONDS=900
@@ -160,10 +193,10 @@ POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
 EOF
 
 echo
-echo "Starting containers..."
+info "Starting containers..."
 docker compose up -d --build
 
-echo "Waiting for health..."
+info "Waiting for health..."
 ok="n"
 for _ in $(seq 1 60); do
   if curl -fsS "http://localhost:${HTTP_PORT}/healthz" >/dev/null 2>&1; then
@@ -174,10 +207,11 @@ for _ in $(seq 1 60); do
 done
 
 if [ "$ok" != "y" ]; then
-  echo "Health check did not pass yet. Showing logs:"
+  error "Health check did not pass yet. Showing logs:"
   docker compose logs --tail=200 api
   exit 1
 fi
+success "Server is healthy!"
 
 PUBLIC_IP=""
 if command -v curl >/dev/null 2>&1; then
@@ -190,24 +224,29 @@ if [ -z "$PUBLIC_IP" ]; then
   PUBLIC_IP="<SERVER_IP>"
 fi
 
+echo -e "\n${C_GREEN}===============================================${C_RESET}"
+echo -e "${C_GREEN}✓ Setup Complete!${C_RESET}"
+echo -e "${C_GREEN}===============================================${C_RESET}"
+echo -e "${C_BOLD}Portal:${C_RESET} ${C_BLUE}http://${PUBLIC_IP}:${HTTP_PORT}/portal/${C_RESET}"
+echo -e "${C_BOLD}Admin:${C_RESET}  ${C_BLUE}http://${PUBLIC_IP}:${HTTP_PORT}/admin/${C_RESET}"
+echo -e "${C_BOLD}API:${C_RESET}    ${C_BLUE}http://${PUBLIC_IP}:${HTTP_PORT}/healthz${C_RESET}"
 echo
-echo "Done."
-echo "Portal: http://${PUBLIC_IP}:${HTTP_PORT}/portal/"
-echo "Admin:  http://${PUBLIC_IP}:${HTTP_PORT}/admin/"
-echo "API:    http://${PUBLIC_IP}:${HTTP_PORT}/healthz"
-echo
-echo "Admin bootstrap:"
-echo "  ADMIN_TOKEN: ${ADMIN_TOKEN}"
+echo -e "${C_BOLD}Admin bootstrap token:${C_RESET}"
+echo -e "  ${C_YELLOW}${ADMIN_TOKEN}${C_RESET}"
+echo -e "${C_GREEN}===============================================${C_RESET}\n"
 
 if confirm "Create first admin user now?" y; then
   ADMIN_EMAIL="$(prompt "Admin email" "")"
   if [ -n "$ADMIN_EMAIL" ]; then
-    curl -fsS -X POST \
+    info "Bootstrapping admin user..."
+    if curl -fsS -X POST \
       -H "content-type: application/json" \
       -H "x-admin-token: ${ADMIN_TOKEN}" \
       -d "{\"email\":\"${ADMIN_EMAIL}\"}" \
-      "http://localhost:${HTTP_PORT}/v1/admin/bootstrap"
-    echo
-    echo "Admin created."
+      "http://localhost:${HTTP_PORT}/v1/admin/bootstrap" > /dev/null; then
+      success "Admin created successfully!"
+    else
+      error "Failed to create admin."
+    fi
   fi
 fi
