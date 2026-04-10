@@ -181,6 +181,16 @@ fi
 cd "$API_DIR"
 
 info "Writing .env file..."
+if [ -f .env ]; then
+  if confirm ".env exists. Overwrite it?" y; then
+    :
+  else
+    warn "Keeping existing .env"
+  fi
+fi
+
+if [ ! -f .env ] || confirm "Write/update .env now?" y; then
+  cat > .env <<EOF
 DATABASE_URL=postgres://kivana:${POSTGRES_PASSWORD}@db:5432/kivana
 JWT_SECRET=${JWT_SECRET}
 ACCESS_TOKEN_TTL_SECONDS=900
@@ -191,6 +201,9 @@ RUST_LOG=info
 KIVANA_HTTP_PORT=${HTTP_PORT}
 POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
 EOF
+  chmod 600 .env || true
+  success ".env written"
+fi
 
 echo
 info "Starting containers..."
