@@ -194,15 +194,25 @@ fi
 cd "$API_DIR"
 
 info "Writing .env file..."
+OVERWRITE_ENV="y"
 if [ -f .env ]; then
   if confirm ".env exists. Overwrite it?" y; then
-    :
+    OVERWRITE_ENV="y"
   else
+    OVERWRITE_ENV="n"
     warn "Keeping existing .env"
+    existing_http_port="$(grep -E '^KIVANA_HTTP_PORT=' .env | head -n1 | cut -d= -f2- || true)"
+    existing_postgres_password="$(grep -E '^POSTGRES_PASSWORD=' .env | head -n1 | cut -d= -f2- || true)"
+    existing_jwt_secret="$(grep -E '^JWT_SECRET=' .env | head -n1 | cut -d= -f2- || true)"
+    existing_admin_token="$(grep -E '^ADMIN_TOKEN=' .env | head -n1 | cut -d= -f2- || true)"
+    if [ -n "$existing_http_port" ]; then HTTP_PORT="$existing_http_port"; fi
+    if [ -n "$existing_postgres_password" ]; then POSTGRES_PASSWORD="$existing_postgres_password"; fi
+    if [ -n "$existing_jwt_secret" ]; then JWT_SECRET="$existing_jwt_secret"; fi
+    if [ -n "$existing_admin_token" ]; then ADMIN_TOKEN="$existing_admin_token"; fi
   fi
 fi
 
-if [ ! -f .env ] || confirm "Write/update .env now?" y; then
+if [ "$OVERWRITE_ENV" = "y" ] || confirm "Write/update .env now?" y; then
   cat > .env <<EOF
 DATABASE_URL=postgres://kivana:${POSTGRES_PASSWORD}@db:5432/kivana
 JWT_SECRET=${JWT_SECRET}
@@ -234,8 +244,38 @@ done
 
 if [ "$ok" != "y" ]; then
   error "Health check did not pass yet. Showing logs:"
-  docker compose logs --tail=200 api
-  exit 1
+  docker compose logs --tail=200 api || true
+  if docker compose logs --tail=200 api 2>/dev/null | grep -qi "password authentication failed for user"; then
+    warn "Detected Postgres password mismatch between API and DB."
+    if [ -r /dev/tty ] && confirm "Fix by resetting DB password to match .env (recommended)?" y; then
+      if docker compose exec -T db psql -U postgres -d postgres -c "ALTER USER kivana WITH PASSWORD '${POSTGRES_PASSWORD}';" >/dev/null 2>&1; then
+        success "DB password updated."
+        docker compose restart api >/dev/null 2>&1 || true
+        info "Waiting for health (retry)..."
+        for _ in $(seq 1 60); do
+          if curl -fsS "http://localhost:${HTTP_PORT}/healthz" >/dev/null 2>&1; then
+            ok="y"
+            break
+          fi
+          sleep 1
+        done
+        if [ "$ok" != "y" ]; then
+          error "Still not healthy after password reset. Showing logs:"
+          docker compose logs --tail=200 api || true
+          exit 1
+        fi
+      else
+        error "Could not update DB password automatically."
+        info "Alternative fix (wipes DB): cd $API_DIR && docker compose down -v && docker compose up -d --build"
+        exit 1
+      fi
+    else
+      info "Fix option (wipes DB): cd $API_DIR && docker compose down -v && docker compose up -d --build"
+      exit 1
+    fi
+  else
+    exit 1
+  fi
 fi
 success "Server is healthy!"
 
