@@ -11,6 +11,13 @@ BASE_DIR_DEFAULT="/opt/kivana"
 REPO_DIR_DEFAULT="${BASE_DIR_DEFAULT}/Kivana-server"
 API_DIR_DEFAULT="${REPO_DIR_DEFAULT}/kivana-api"
 
+REPO_URL="$REPO_URL_DEFAULT"
+BASE_DIR="$BASE_DIR_DEFAULT"
+HTTP_PORT="8080"
+POSTGRES_PASSWORD=""
+JWT_SECRET=""
+ADMIN_TOKEN=""
+
 prompt() {
   local label="$1"
   local def="${2:-}"
@@ -71,30 +78,36 @@ rand_hex() {
 echo "Kivana Server Setup"
 echo
 
-REPO_URL="$(prompt "GitHub repo URL" "$REPO_URL_DEFAULT")"
-BASE_DIR="$(prompt "Install base dir" "$BASE_DIR_DEFAULT")"
-REPO_DIR="${BASE_DIR}/Kivana-server"
-API_DIR="${REPO_DIR}/kivana-api"
+if [ -r /dev/tty ]; then
+  REPO_URL="$(prompt "GitHub repo URL" "$REPO_URL_DEFAULT")"
+  BASE_DIR="$(prompt "Install base dir" "$BASE_DIR_DEFAULT")"
+  HTTP_PORT="$(prompt "HTTP port" "8080")"
 
-HTTP_PORT="$(prompt "HTTP port" "8080")"
+  POSTGRES_PASSWORD="$(prompt "Postgres password (leave blank to auto-generate)" "")"
+  JWT_SECRET="$(prompt "JWT secret (leave blank to auto-generate)" "")"
+  ADMIN_TOKEN="$(prompt "Admin token (leave blank to auto-generate)" "")"
+else
+  echo "No TTY detected. Using defaults (non-interactive)."
+  echo "Tip: run without piping for prompts: curl -fsSLO <url> && bash setup-wizard.sh"
+fi
 
-POSTGRES_PASSWORD="$(prompt "Postgres password (leave blank to auto-generate)" "")"
 if [ -z "$POSTGRES_PASSWORD" ]; then
   POSTGRES_PASSWORD="$(rand_hex 24)"
   echo "Generated Postgres password."
 fi
 
-JWT_SECRET="$(prompt "JWT secret (leave blank to auto-generate)" "")"
 if [ -z "$JWT_SECRET" ]; then
   JWT_SECRET="$(rand_hex 48)"
   echo "Generated JWT secret."
 fi
 
-ADMIN_TOKEN="$(prompt "Admin token (leave blank to auto-generate)" "")"
 if [ -z "$ADMIN_TOKEN" ]; then
   ADMIN_TOKEN="$(rand_hex 24)"
   echo "Generated admin token."
 fi
+
+REPO_DIR="${BASE_DIR}/Kivana-server"
+API_DIR="${REPO_DIR}/kivana-api"
 
 if ! command -v git >/dev/null 2>&1; then
   if confirm "Install git now?" y; then
