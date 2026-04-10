@@ -27,7 +27,7 @@ API_DIR_DEFAULT="${REPO_DIR_DEFAULT}/kivana-api"
 
 REPO_URL="$REPO_URL_DEFAULT"
 BASE_DIR="$BASE_DIR_DEFAULT"
-HTTP_PORT="8080"
+HTTP_PORT="80"
 POSTGRES_PASSWORD=""
 JWT_SECRET=""
 ADMIN_TOKEN=""
@@ -120,7 +120,7 @@ if [ -r /dev/tty ]; then
   info "Starting interactive setup..."
   REPO_URL="$(prompt "GitHub repo URL" "$REPO_URL_DEFAULT")"
   BASE_DIR="$(prompt "Install base dir" "$BASE_DIR_DEFAULT")"
-  HTTP_PORT="$(prompt "HTTP port" "8080")"
+  HTTP_PORT="$(prompt "HTTP port" "80")"
 
   POSTGRES_PASSWORD="$(prompt "Postgres password (leave blank to auto-generate)" "")"
   JWT_SECRET="$(prompt "JWT secret (leave blank to auto-generate)" "")"
@@ -290,12 +290,17 @@ if [ -z "$PUBLIC_IP" ]; then
   PUBLIC_IP="<SERVER_IP>"
 fi
 
+PORT_SUFFIX=":${HTTP_PORT}"
+if [ "$HTTP_PORT" = "80" ]; then
+  PORT_SUFFIX=""
+fi
+
 echo -e "\n${C_GREEN}===============================================${C_RESET}"
 echo -e "${C_GREEN}✓ Setup Complete!${C_RESET}"
 echo -e "${C_GREEN}===============================================${C_RESET}"
-echo -e "${C_BOLD}Portal:${C_RESET} ${C_BLUE}http://${PUBLIC_IP}:${HTTP_PORT}/portal/${C_RESET}"
-echo -e "${C_BOLD}Admin:${C_RESET}  ${C_BLUE}http://${PUBLIC_IP}:${HTTP_PORT}/admin/${C_RESET}"
-echo -e "${C_BOLD}API:${C_RESET}    ${C_BLUE}http://${PUBLIC_IP}:${HTTP_PORT}/healthz${C_RESET}"
+echo -e "${C_BOLD}Portal:${C_RESET} ${C_BLUE}http://${PUBLIC_IP}${PORT_SUFFIX}/portal/${C_RESET}"
+echo -e "${C_BOLD}Admin:${C_RESET}  ${C_BLUE}http://${PUBLIC_IP}${PORT_SUFFIX}/admin/${C_RESET}"
+echo -e "${C_BOLD}API:${C_RESET}    ${C_BLUE}http://${PUBLIC_IP}${PORT_SUFFIX}/healthz${C_RESET}"
 echo
 echo -e "${C_BOLD}Admin bootstrap token:${C_RESET}"
 echo -e "  ${C_YELLOW}${ADMIN_TOKEN}${C_RESET}"

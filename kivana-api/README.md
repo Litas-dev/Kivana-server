@@ -44,6 +44,7 @@ Edit `.env` and set:
 - `JWT_SECRET` to a long random value
 - `ADMIN_TOKEN` to a long random value
 - `POSTGRES_PASSWORD` to a strong password
+- `KIVANA_HTTP_PORT=80` if you want URLs without `:8080`
 
 4) Start:
 
@@ -59,9 +60,15 @@ curl -fsS http://localhost:8080/healthz && echo
 
 ## URLs
 
-- API: `http://SERVER_IP:8080/`
-- Admin UI: `http://SERVER_IP:8080/admin/`
-- Portal UI: `http://SERVER_IP:8080/portal/`
+- If `KIVANA_HTTP_PORT=80`:
+  - API: `http://SERVER_IP/`
+  - Admin UI: `http://SERVER_IP/admin/`
+  - Portal UI: `http://SERVER_IP/portal/`
+
+- If `KIVANA_HTTP_PORT=8080`:
+  - API: `http://SERVER_IP:8080/`
+  - Admin UI: `http://SERVER_IP:8080/admin/`
+  - Portal UI: `http://SERVER_IP:8080/portal/`
 
 ## Admin Bootstrap
 
