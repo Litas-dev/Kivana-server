@@ -16,10 +16,18 @@ prompt() {
   local def="${2:-}"
   local v
   if [ -n "$def" ]; then
-    read -r -p "${label} [${def}]: " v
+    if [ -r /dev/tty ]; then
+      read -r -p "${label} [${def}]: " v </dev/tty || v=""
+    else
+      read -r -p "${label} [${def}]: " v || v=""
+    fi
     if [ -z "$v" ]; then v="$def"; fi
   else
-    read -r -p "${label}: " v
+    if [ -r /dev/tty ]; then
+      read -r -p "${label}: " v </dev/tty || v=""
+    else
+      read -r -p "${label}: " v || v=""
+    fi
   fi
   printf "%s" "$v"
 }
@@ -30,10 +38,18 @@ confirm() {
   local v
   while true; do
     if [ "$def" = "y" ]; then
-      read -r -p "${label} [Y/n]: " v
+      if [ -r /dev/tty ]; then
+        read -r -p "${label} [Y/n]: " v </dev/tty || v=""
+      else
+        read -r -p "${label} [Y/n]: " v || v=""
+      fi
       v="${v:-y}"
     else
-      read -r -p "${label} [y/N]: " v
+      if [ -r /dev/tty ]; then
+        read -r -p "${label} [y/N]: " v </dev/tty || v=""
+      else
+        read -r -p "${label} [y/N]: " v || v=""
+      fi
       v="${v:-n}"
     fi
     case "$v" in
