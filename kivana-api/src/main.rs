@@ -532,6 +532,7 @@ async fn entitlements(State(state): State<AppState>, headers: axum::http::Header
 #[serde(rename_all = "camelCase")]
 struct SelectPlanRequest {
   plan_code: String,
+  billing_cycle: Option<String>,
 }
 
 async fn portal_select_plan(
@@ -544,13 +545,23 @@ async fn portal_select_plan(
     Err(e) => return e,
   };
 
-  let valid_plans = ["basic", "pro", "lifetime_pro"];
+  let valid_plans = ["basic", "standard", "pro", "lifetime_pro"];
   if !valid_plans.contains(&req.plan_code.as_str()) {
     return err(StatusCode::BAD_REQUEST, "invalid_plan").into_response();
   }
 
   let product_code = "kivana";
   let plan_code = req.plan_code.trim().to_lowercase();
+  let billing_cycle = req
+    .billing_cycle
+    .clone()
+    .unwrap_or_else(|| "monthly".to_string())
+    .trim()
+    .to_lowercase();
+  let valid_cycles = ["monthly", "yearly"];
+  if !valid_cycles.contains(&billing_cycle.as_str()) {
+    return err(StatusCode::BAD_REQUEST, "invalid_billing_cycle").into_response();
+  }
 
   let prod_row = sqlx::query("SELECT id FROM products WHERE code = $1")
     .bind(product_code)
@@ -574,11 +585,10 @@ async fn portal_select_plan(
   // Set the end date appropriately
   let ends_at = match req.plan_code.as_str() {
     "basic" | "lifetime_pro" => None,
-    "pro" => {
-      // Give them 1 month of Pro as an example, since this is a demo portal
-      let d = OffsetDateTime::now_utc() + Duration::days(30);
-      Some(d)
-    },
+    "standard" | "pro" => {
+      let days = if billing_cycle == "yearly" { 365 } else { 30 };
+      Some(OffsetDateTime::now_utc() + Duration::days(days))
+    }
     _ => None,
   };
 

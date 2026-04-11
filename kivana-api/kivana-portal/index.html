@@ -50,8 +50,8 @@
     <!-- Dashboard View (Plan Selection) -->
     <div id="viewDashboard" class="view hidden">
       <div class="dashboard-header">
-        <h2>Choose your plan</h2>
-        <p class="text-muted">Select a plan to unlock features in the Kivana desktop app.</p>
+        <h2>Plans</h2>
+        <p class="text-muted">Choose a plan that matches your workflow — from personal to professional.</p>
       </div>
 
       <div class="plans-grid">
@@ -59,48 +59,83 @@
         <div class="plan-card">
           <div class="plan-header">
             <h3>Basic</h3>
-            <div class="price">Free</div>
-            <p class="plan-desc">Essential tools to track your daily expenses and income.</p>
+            <div class="price">€0</div>
+            <p class="plan-desc">Basic tools to keep things organized.</p>
           </div>
           <ul class="features">
-            <li>Basic Accounts & Ledgers</li>
-            <li>Expense Tracking</li>
-            <li>CSV Imports</li>
+            <li>Basic bill handling</li>
+            <li>Store invoices + bank statements</li>
+            <li>Export a clean package for your accountant</li>
+            <li>Local storage</li>
           </ul>
-          <button class="btn btn-plan w-full" data-plan="basic" id="btnPlanBasic">Select Basic</button>
+          <button class="btn btn-plan w-full" data-plan="basic" id="btnPlanBasic">Get Basic</button>
         </div>
 
-        <!-- Pro Plan -->
+        <!-- Standard Plan -->
         <div class="plan-card highlight">
           <div class="badge">Most Popular</div>
           <div class="plan-header">
-            <h3>Pro</h3>
-            <div class="price">$4.99<span>/mo</span></div>
-            <p class="plan-desc">Advanced analytics and goal tracking for serious budgeters.</p>
+            <h3>Standard</h3>
+            <div class="priceDual">
+              <div class="priceRow">
+                <span class="priceMain">€165</span><span class="priceUnit">/yr</span>
+              </div>
+              <div class="priceRow">
+                <span class="priceMain">€15</span><span class="priceUnit">/mo</span>
+              </div>
+            </div>
+            <p class="plan-note">Save 1 month with annual billing. €165 / year (1 month free).</p>
+            <p class="plan-desc">More features with basic AI support.</p>
           </div>
           <ul class="features">
             <li>Everything in Basic</li>
-            <li>Advanced Charts & Reports</li>
-            <li>Debts & Goals Tracking</li>
-            <li>AI Command Bar</li>
+            <li>Advanced filters + sorting</li>
+            <li>Goals + debts</li>
+            <li>Backup + restore bundle</li>
+            <li>Expanded reporting tools</li>
+            <li>AI assistant (basic)</li>
           </ul>
-          <button class="btn btn-primary w-full" data-plan="pro" id="btnPlanPro">Select Pro</button>
+          <div class="plan-actions">
+            <button class="btn btn-primary w-full" data-plan="standard" data-billing-cycle="yearly" id="btnPlanStandardYearly">Get Standard (Yearly)</button>
+            <button class="btn btn-secondary w-full" data-plan="standard" data-billing-cycle="monthly" id="btnPlanStandardMonthly">Get Standard (Monthly)</button>
+          </div>
         </div>
 
-        <!-- Lifetime Plan -->
+        <!-- Pro Plan -->
         <div class="plan-card">
           <div class="plan-header">
-            <h3>Lifetime</h3>
-            <div class="price">$49.99<span>/once</span></div>
-            <p class="plan-desc">Pay once, use forever. All Pro features included.</p>
+            <h3>Pro</h3>
+            <div class="priceDual">
+              <div class="priceRow">
+                <span class="priceMain">€539</span><span class="priceUnit">/yr</span>
+              </div>
+              <div class="priceRow">
+                <span class="priceMain">€49</span><span class="priceUnit">/mo</span>
+              </div>
+            </div>
+            <p class="plan-note">Save 1 month with annual billing. €539 / year (1 month free).</p>
+            <p class="plan-desc">For accountants and advanced tax workflows.</p>
           </div>
           <ul class="features">
-            <li>All Pro Features</li>
-            <li>One-time Payment</li>
-            <li>Lifetime Updates</li>
+            <li>Everything in Standard</li>
+            <li>Invoice attachments workflow</li>
+            <li>AI-assisted categorization + summaries</li>
+            <li>Client-ready export packs and reporting</li>
+            <li>Tax-year reporting support</li>
+            <li>Priority support</li>
           </ul>
-          <button class="btn btn-plan w-full" data-plan="lifetime_pro" id="btnPlanLifetime">Select Lifetime</button>
+          <div class="plan-actions">
+            <button class="btn btn-primary w-full" data-plan="pro" data-billing-cycle="yearly" id="btnPlanProYearly">Get Pro (Yearly)</button>
+            <button class="btn btn-secondary w-full" data-plan="pro" data-billing-cycle="monthly" id="btnPlanProMonthly">Get Pro (Monthly)</button>
+          </div>
         </div>
+      </div>
+
+      <div class="lifetime-block">
+        <div class="lifetime-title">Lifetime license (Pro)</div>
+        <div class="lifetime-price">€1,599 <span class="lifetime-unit">one-time</span></div>
+        <div class="lifetime-desc">For firms that prefer a one-time purchase instead of subscription billing.</div>
+        <button class="btn btn-plan w-full" data-plan="lifetime_pro" id="btnPlanLifetime">Get Lifetime (Pro)</button>
       </div>
 
       <div class="current-plan-banner hidden" id="currentPlanBanner">

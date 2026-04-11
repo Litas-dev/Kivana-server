@@ -19,7 +19,6 @@ const els = {
   lblCurrentPlan: document.getElementById('lblCurrentPlan'),
 
   btnPlanBasic: document.getElementById('btnPlanBasic'),
-  btnPlanPro: document.getElementById('btnPlanPro'),
   btnPlanLifetime: document.getElementById('btnPlanLifetime')
 }
 
@@ -142,20 +141,20 @@ async function loadEntitlements() {
   return json.products.find(p => p.productCode === 'kivana')
 }
 
-async function handleSelectPlan(planCode) {
+async function handleSelectPlan(payload) {
   els.dashboardStatus.textContent = 'Processing...'
-  document.querySelectorAll('.plans-grid button').forEach(b => b.disabled = true)
+  document.querySelectorAll('#viewDashboard button').forEach(b => b.disabled = true)
   try {
     await apiFetch('/v1/portal/select-plan', {
       method: 'POST',
-      body: JSON.stringify({ planCode })
+      body: JSON.stringify(payload)
     })
     els.dashboardStatus.textContent = 'Plan updated successfully!'
     await showDashboard()
   } catch (err) {
     els.dashboardStatus.textContent = `Error: ${err.message}`
   } finally {
-    document.querySelectorAll('.plans-grid button').forEach(b => b.disabled = false)
+    document.querySelectorAll('#viewDashboard button').forEach(b => b.disabled = false)
     setTimeout(() => els.dashboardStatus.textContent = '', 3000)
   }
 }
@@ -202,9 +201,17 @@ els.linkToggleAuth.addEventListener('click', toggleAuthMode)
 els.authForm.addEventListener('submit', handleAuthSubmit)
 els.btnSignOut.addEventListener('click', handleSignOut)
 
-els.btnPlanBasic.addEventListener('click', () => handleSelectPlan('basic'))
-els.btnPlanPro.addEventListener('click', () => handleSelectPlan('pro'))
-els.btnPlanLifetime.addEventListener('click', () => handleSelectPlan('lifetime_pro'))
+els.btnPlanBasic.addEventListener('click', () => handleSelectPlan({ planCode: 'basic' }))
+els.btnPlanLifetime.addEventListener('click', () => handleSelectPlan({ planCode: 'lifetime_pro' }))
+
+document.querySelectorAll('[data-plan][data-billing-cycle]').forEach((el) => {
+  el.addEventListener('click', () => {
+    const planCode = String(el.getAttribute('data-plan') || '').trim()
+    const billingCycle = String(el.getAttribute('data-billing-cycle') || '').trim()
+    if (!planCode || !billingCycle) return
+    void handleSelectPlan({ planCode, billingCycle })
+  })
+})
 
 // Init
 ;(async () => {
