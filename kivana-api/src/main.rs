@@ -39,6 +39,7 @@ struct AppState {
 }
 
 #[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 struct UserEvent {
   user_id: String,
   event_type: String,
