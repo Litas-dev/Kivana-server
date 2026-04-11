@@ -18,11 +18,24 @@ const els = {
   currentPlanBanner: document.getElementById('currentPlanBanner'),
   lblCurrentPlan: document.getElementById('lblCurrentPlan'),
 
+  btnBillingYearly: document.getElementById('btnBillingYearly'),
+  btnBillingMonthly: document.getElementById('btnBillingMonthly'),
+
+  stdMainPrice: document.getElementById('stdMainPrice'),
+  stdMainUnit: document.getElementById('stdMainUnit'),
+  stdSubPrice: document.getElementById('stdSubPrice'),
+  stdNote: document.getElementById('stdNote'),
+  proMainPrice: document.getElementById('proMainPrice'),
+  proMainUnit: document.getElementById('proMainUnit'),
+  proSubPrice: document.getElementById('proSubPrice'),
+  proNote: document.getElementById('proNote'),
+
   btnPlanBasic: document.getElementById('btnPlanBasic'),
   btnPlanLifetime: document.getElementById('btnPlanLifetime')
 }
 
 let isLoginMode = true
+let billingCycle = 'yearly'
 
 function getAccessToken() { return localStorage.getItem('kivanaPortal/accessToken') || '' }
 function getRefreshToken() { return localStorage.getItem('kivanaPortal/refreshToken') || '' }
@@ -141,6 +154,45 @@ async function loadEntitlements() {
   return json.products.find(p => p.productCode === 'kivana')
 }
 
+function setBillingCycle(next) {
+  const v = String(next || '').trim().toLowerCase()
+  if (v !== 'yearly' && v !== 'monthly') return
+  billingCycle = v
+  els.btnBillingYearly.classList.toggle('active', billingCycle === 'yearly')
+  els.btnBillingMonthly.classList.toggle('active', billingCycle === 'monthly')
+  updatePricingUI()
+}
+
+function updatePricingUI() {
+  if (billingCycle === 'yearly') {
+    els.stdMainPrice.textContent = '€165'
+    els.stdMainUnit.textContent = '/yr'
+    els.stdSubPrice.textContent = '€15/mo'
+    els.stdNote.textContent = 'Save 1 month with annual billing. €165 / year (1 month free).'
+    els.proMainPrice.textContent = '€539'
+    els.proMainUnit.textContent = '/yr'
+    els.proSubPrice.textContent = '€49/mo'
+    els.proNote.textContent = 'Save 1 month with annual billing. €539 / year (1 month free).'
+    const stdBtn = document.getElementById('btnPlanStandard')
+    const proBtn = document.getElementById('btnPlanPro')
+    if (stdBtn) stdBtn.textContent = 'Get Standard (Yearly)'
+    if (proBtn) proBtn.textContent = 'Get Pro (Yearly)'
+  } else {
+    els.stdMainPrice.textContent = '€15'
+    els.stdMainUnit.textContent = '/mo'
+    els.stdSubPrice.textContent = '€165/yr'
+    els.stdNote.textContent = 'Annual billing saves 1 month. €165 / year (1 month free).'
+    els.proMainPrice.textContent = '€49'
+    els.proMainUnit.textContent = '/mo'
+    els.proSubPrice.textContent = '€539/yr'
+    els.proNote.textContent = 'Annual billing saves 1 month. €539 / year (1 month free).'
+    const stdBtn = document.getElementById('btnPlanStandard')
+    const proBtn = document.getElementById('btnPlanPro')
+    if (stdBtn) stdBtn.textContent = 'Get Standard (Monthly)'
+    if (proBtn) proBtn.textContent = 'Get Pro (Monthly)'
+  }
+}
+
 async function handleSelectPlan(payload) {
   els.dashboardStatus.textContent = 'Processing...'
   document.querySelectorAll('#viewDashboard button').forEach(b => b.disabled = true)
@@ -201,15 +253,18 @@ els.linkToggleAuth.addEventListener('click', toggleAuthMode)
 els.authForm.addEventListener('submit', handleAuthSubmit)
 els.btnSignOut.addEventListener('click', handleSignOut)
 
-els.btnPlanBasic.addEventListener('click', () => handleSelectPlan({ planCode: 'basic' }))
-els.btnPlanLifetime.addEventListener('click', () => handleSelectPlan({ planCode: 'lifetime_pro' }))
+els.btnBillingYearly.addEventListener('click', () => setBillingCycle('yearly'))
+els.btnBillingMonthly.addEventListener('click', () => setBillingCycle('monthly'))
 
-document.querySelectorAll('[data-plan][data-billing-cycle]').forEach((el) => {
+document.querySelectorAll('[data-plan]').forEach((el) => {
   el.addEventListener('click', () => {
     const planCode = String(el.getAttribute('data-plan') || '').trim()
-    const billingCycle = String(el.getAttribute('data-billing-cycle') || '').trim()
-    if (!planCode || !billingCycle) return
-    void handleSelectPlan({ planCode, billingCycle })
+    if (!planCode) return
+    if (planCode === 'standard' || planCode === 'pro') {
+      void handleSelectPlan({ planCode, billingCycle })
+      return
+    }
+    void handleSelectPlan({ planCode })
   })
 })
 
@@ -226,3 +281,5 @@ document.querySelectorAll('[data-plan][data-billing-cycle]').forEach((el) => {
   }
   await showAuth()
 })()
+
+setBillingCycle('yearly')

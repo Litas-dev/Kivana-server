@@ -52,10 +52,13 @@
       <div class="dashboard-header">
         <h2>Plans</h2>
         <p class="text-muted">Choose a plan that matches your workflow — from personal to professional.</p>
+        <div class="billingToggle" role="group" aria-label="Billing cycle">
+          <button type="button" class="billingToggleBtn active" id="btnBillingYearly" data-cycle="yearly">Yearly</button>
+          <button type="button" class="billingToggleBtn" id="btnBillingMonthly" data-cycle="monthly">Monthly</button>
+        </div>
       </div>
 
       <div class="plans-grid">
-        <!-- Basic Plan -->
         <div class="plan-card">
           <div class="plan-header">
             <h3>Basic</h3>
@@ -71,20 +74,15 @@
           <button class="btn btn-plan w-full" data-plan="basic" id="btnPlanBasic">Get Basic</button>
         </div>
 
-        <!-- Standard Plan -->
         <div class="plan-card highlight">
           <div class="badge">Most Popular</div>
           <div class="plan-header">
             <h3>Standard</h3>
-            <div class="priceDual">
-              <div class="priceRow">
-                <span class="priceMain">€165</span><span class="priceUnit">/yr</span>
-              </div>
-              <div class="priceRow">
-                <span class="priceMain">€15</span><span class="priceUnit">/mo</span>
-              </div>
+            <div class="price">
+              <span class="priceMain" id="stdMainPrice">€165</span><span class="priceUnit" id="stdMainUnit">/yr</span>
             </div>
-            <p class="plan-note">Save 1 month with annual billing. €165 / year (1 month free).</p>
+            <div class="subPrice" id="stdSubPrice">€15/mo</div>
+            <p class="plan-note" id="stdNote">Save 1 month with annual billing. €165 / year (1 month free).</p>
             <p class="plan-desc">More features with basic AI support.</p>
           </div>
           <ul class="features">
@@ -95,25 +93,17 @@
             <li>Expanded reporting tools</li>
             <li>AI assistant (basic)</li>
           </ul>
-          <div class="plan-actions">
-            <button class="btn btn-primary w-full" data-plan="standard" data-billing-cycle="yearly" id="btnPlanStandardYearly">Get Standard (Yearly)</button>
-            <button class="btn btn-secondary w-full" data-plan="standard" data-billing-cycle="monthly" id="btnPlanStandardMonthly">Get Standard (Monthly)</button>
-          </div>
+          <button class="btn btn-primary w-full" data-plan="standard" id="btnPlanStandard">Get Standard (Yearly)</button>
         </div>
 
-        <!-- Pro Plan -->
         <div class="plan-card">
           <div class="plan-header">
             <h3>Pro</h3>
-            <div class="priceDual">
-              <div class="priceRow">
-                <span class="priceMain">€539</span><span class="priceUnit">/yr</span>
-              </div>
-              <div class="priceRow">
-                <span class="priceMain">€49</span><span class="priceUnit">/mo</span>
-              </div>
+            <div class="price">
+              <span class="priceMain" id="proMainPrice">€539</span><span class="priceUnit" id="proMainUnit">/yr</span>
             </div>
-            <p class="plan-note">Save 1 month with annual billing. €539 / year (1 month free).</p>
+            <div class="subPrice" id="proSubPrice">€49/mo</div>
+            <p class="plan-note" id="proNote">Save 1 month with annual billing. €539 / year (1 month free).</p>
             <p class="plan-desc">For accountants and advanced tax workflows.</p>
           </div>
           <ul class="features">
@@ -124,18 +114,24 @@
             <li>Tax-year reporting support</li>
             <li>Priority support</li>
           </ul>
-          <div class="plan-actions">
-            <button class="btn btn-primary w-full" data-plan="pro" data-billing-cycle="yearly" id="btnPlanProYearly">Get Pro (Yearly)</button>
-            <button class="btn btn-secondary w-full" data-plan="pro" data-billing-cycle="monthly" id="btnPlanProMonthly">Get Pro (Monthly)</button>
-          </div>
+          <button class="btn btn-primary w-full" data-plan="pro" id="btnPlanPro">Get Pro (Yearly)</button>
         </div>
-      </div>
 
-      <div class="lifetime-block">
-        <div class="lifetime-title">Lifetime license (Pro)</div>
-        <div class="lifetime-price">€1,599 <span class="lifetime-unit">one-time</span></div>
-        <div class="lifetime-desc">For firms that prefer a one-time purchase instead of subscription billing.</div>
-        <button class="btn btn-plan w-full" data-plan="lifetime_pro" id="btnPlanLifetime">Get Lifetime (Pro)</button>
+        <div class="plan-card">
+          <div class="plan-header">
+            <h3>Lifetime (Pro)</h3>
+            <div class="price">
+              <span class="priceMain">€1,599</span><span class="priceUnit">one-time</span>
+            </div>
+            <p class="plan-desc">For firms that prefer a one-time purchase instead of subscription billing.</p>
+          </div>
+          <ul class="features">
+            <li>Everything in Pro</li>
+            <li>Pay once</li>
+            <li>Lifetime access</li>
+          </ul>
+          <button class="btn btn-plan w-full" data-plan="lifetime_pro" id="btnPlanLifetime">Get Lifetime</button>
+        </div>
       </div>
 
       <div class="current-plan-banner hidden" id="currentPlanBanner">
