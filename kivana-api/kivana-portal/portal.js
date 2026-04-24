@@ -364,7 +364,7 @@ function resetPlanButtonLabels() {
   if (btnBasic) btnBasic.textContent = 'Get Basic'
   if (btnLifetime) btnLifetime.textContent = 'Get Lifetime'
   updatePricingUI()
-  if (btnStd && btnStd.textContent === 'Current plan') btnStd.textContent = billingCycle === 'yearly' ? 'Get Standard (Yearly)' : 'Get Standard (Monthly)'
+  if (btnStd && btnStd.textContent === 'Current plan') btnStd.textContent = billingCycle === 'yearly' ? 'Get Ordinary (Yearly)' : 'Get Ordinary (Monthly)'
   if (btnPro && btnPro.textContent === 'Current plan') btnPro.textContent = billingCycle === 'yearly' ? 'Get Pro (Yearly)' : 'Get Pro (Monthly)'
 }
 
@@ -431,7 +431,7 @@ function updatePricingUI() {
     els.proMainUnit.textContent = '/yr'
     els.proSubPrice.textContent = '€49/mo'
     els.proNote.textContent = 'Save 1 month with annual billing. €539 / year (1 month free).'
-    if (stdBtn && !stdBtn.disabled) stdBtn.textContent = 'Get Standard (Yearly)'
+    if (stdBtn && !stdBtn.disabled) stdBtn.textContent = 'Get Ordinary (Yearly)'
     if (proBtn && !proBtn.disabled) proBtn.textContent = 'Get Pro (Yearly)'
   } else {
     els.stdMainPrice.textContent = '€15'
@@ -442,7 +442,7 @@ function updatePricingUI() {
     els.proMainUnit.textContent = '/mo'
     els.proSubPrice.textContent = '€539/yr'
     els.proNote.textContent = 'Annual billing saves 1 month. €539 / year (1 month free).'
-    if (stdBtn && !stdBtn.disabled) stdBtn.textContent = 'Get Standard (Monthly)'
+    if (stdBtn && !stdBtn.disabled) stdBtn.textContent = 'Get Ordinary (Monthly)'
     if (proBtn && !proBtn.disabled) proBtn.textContent = 'Get Pro (Monthly)'
   }
 }
@@ -669,7 +669,7 @@ function startFree() {
   void showAuth()
 }
 
-if (els.navFeatures) els.navFeatures.addEventListener('click', () => void goToPublicSection('features'))
+if (els.navFeatures) els.navFeatures.addEventListener('click', () => void goToPublicSection('how'))
 if (els.navPricing) els.navPricing.addEventListener('click', () => void goToPublicSection('pricing'))
 if (els.navAccountants) els.navAccountants.addEventListener('click', () => void goToPublicSection('accountants'))
 if (els.navSecurity) els.navSecurity.addEventListener('click', () => void goToPublicSection('security'))
@@ -694,7 +694,7 @@ if (els.btnMenu) els.btnMenu.addEventListener('click', () => {
 if (els.btnCloseMenu) els.btnCloseMenu.addEventListener('click', closeMenu)
 if (els.menuBackdrop) els.menuBackdrop.addEventListener('click', closeMenu)
 
-if (els.mNavFeatures) els.mNavFeatures.addEventListener('click', () => void goToPublicSection('features'))
+if (els.mNavFeatures) els.mNavFeatures.addEventListener('click', () => void goToPublicSection('how'))
 if (els.mNavPricing) els.mNavPricing.addEventListener('click', () => void goToPublicSection('pricing'))
 if (els.mNavAccountants) els.mNavAccountants.addEventListener('click', () => void goToPublicSection('accountants'))
 if (els.mNavSecurity) els.mNavSecurity.addEventListener('click', () => void goToPublicSection('security'))
@@ -757,10 +757,11 @@ async function applyHashNav() {
   if (isAuthed()) return
   const id = String(window.location.hash || '').replace(/^#/, '').trim()
   if (!id) return
-  const allow = new Set(['features', 'pricing', 'accountants', 'security', 'resources'])
-  if (!allow.has(id)) return
+  const normalized = id === 'features' ? 'how' : id
+  const allow = new Set(['how', 'pricing', 'accountants', 'security', 'resources'])
+  if (!allow.has(normalized)) return
   await showDashboard()
-  setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0)
+  setTimeout(() => document.getElementById(normalized)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0)
 }
 
 window.addEventListener('hashchange', () => void applyHashNav())

@@ -566,6 +566,29 @@ body {
   justify-content: flex-start;
 }
 
+.hero-bullets {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.45rem;
+  color: rgba(229,231,235,0.88);
+  font-weight: 700;
+  list-style: none;
+  padding-left: 0;
+}
+
+.hero-bullets li {
+  padding-left: 1.2rem;
+  position: relative;
+}
+
+.hero-bullets li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: rgba(163,230,53,0.85);
+  font-weight: 900;
+}
+
 .hero-meta {
   margin-top: 0.75rem;
   color: var(--text-muted);

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Kivana — Personal Finance & Accounting</title>
   <meta name="description" content="Kivana is local-first personal finance and accounting software. Your data stays on your device, with flexible plans and accountant-ready exports when you need them." />
-  <link rel="stylesheet" href="portal.css?v=0.4.4" />
+  <link rel="stylesheet" href="portal.css?v=0.4.5" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -16,10 +16,10 @@
       <div class="logo">Kivana</div>
       <div class="nav-links">
         <div class="nav-main">
-          <button class="nav-anchor" id="navFeatures">Features</button>
+          <button class="nav-anchor" id="navFeatures">How it works</button>
           <button class="nav-anchor" id="navPricing">Pricing</button>
           <button class="nav-anchor" id="navAccountants">For Accountants</button>
-          <button class="nav-anchor" id="navSecurity">Security</button>
+          <button class="nav-anchor" id="navSecurity">Trust</button>
           <button class="nav-anchor" id="navResources">Resources</button>
         </div>
         <div class="nav-actions">
@@ -45,10 +45,10 @@
           <button class="mobile-menu-close" id="btnCloseMenu" type="button" aria-label="Close menu">✕</button>
         </div>
         <div class="mobile-menu-links" id="mobileMenuPublic">
-          <button class="mobile-menu-link" id="mNavFeatures">Features</button>
+          <button class="mobile-menu-link" id="mNavFeatures">How it works</button>
           <button class="mobile-menu-link" id="mNavPricing">Pricing</button>
           <button class="mobile-menu-link" id="mNavAccountants">For Accountants</button>
-          <button class="mobile-menu-link" id="mNavSecurity">Security</button>
+          <button class="mobile-menu-link" id="mNavSecurity">Trust</button>
           <button class="mobile-menu-link" id="mNavResources">Resources</button>
         </div>
         <div class="mobile-menu-links hidden" id="mobileMenuAuthed">
@@ -107,18 +107,16 @@
             <div>
               <div class="hero-kicker">Local-first desktop software</div>
               <h2 class="hero-title">Your finances.<br/>On your device.</h2>
-              <p class="hero-subtitle">No cloud. No nonsense. Full control. Track spending, keep invoices, and export accountant-ready packs — all stored locally on your computer.</p>
+              <p class="hero-subtitle">Local-first accounting with optional cloud and on-demand accountants. Track spending, keep invoices, and export accountant-ready packs — with no cloud required.</p>
               <div class="hero-ctas">
                 <button class="btn btn-primary btn-hero" id="btnHeroStartFree">Start Free</button>
                 <button class="btn btn-secondary btn-hero" id="btnHeroViewPlans">View Plans</button>
               </div>
-              <div class="hero-meta">Downloads for macOS and Windows are coming soon.</div>
-              <div class="hero-badges">
-                <span class="badge-chip">Works offline</span>
-                <span class="badge-chip">No cloud</span>
-                <span class="badge-chip">No tracking</span>
-                <span class="badge-chip">Private by default</span>
-              </div>
+              <ul class="hero-bullets">
+                <li>No cloud required</li>
+                <li>Pay only for what you use</li>
+                <li>Hire an accountant in one click</li>
+              </ul>
             </div>
             <div class="hero-media">
               <img
@@ -127,78 +125,33 @@
                 loading="lazy"
                 src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1800&q=80"
               />
-              <div class="hero-stats">
-                <div class="stat">
-                  <div class="stat-k">Local-first</div>
-                  <div class="stat-v">Data stays on device</div>
-                </div>
-                <div class="stat">
-                  <div class="stat-k">Accountant-ready</div>
-                  <div class="stat-v">Exports and reports</div>
-                </div>
-                <div class="stat">
-                  <div class="stat-k">Flexible</div>
-                  <div class="stat-v">Upgrade when needed</div>
-                </div>
-              </div>
             </div>
           </div>
 
-          <section class="section" id="story">
-            <div class="section-title">Stop renting your own data</div>
-            <div class="section-subtitle">Most finance apps push you into the cloud. Kivana is built for people who want control.</div>
+          <section class="section" id="how">
+            <div class="section-title">How it works</div>
+            <div class="section-subtitle">A simple flow. Start personal, go professional only when needed.</div>
             <div class="steps">
               <div class="step">
                 <div class="step-n">1</div>
                 <div>
-                  <div class="step-t">Cloud lock-in</div>
-                  <div class="step-d">Monthly fees, accounts, and data living somewhere you don’t control.</div>
+                  <div class="step-t">Install and keep data local</div>
+                  <div class="step-d">Run Kivana on your device. No cloud required.</div>
                 </div>
               </div>
               <div class="step">
                 <div class="step-n">2</div>
                 <div>
-                  <div class="step-t">Privacy trade-offs</div>
-                  <div class="step-d">Tracking, sync issues, and “convenience” that comes with risks.</div>
+                  <div class="step-t">Track and organize</div>
+                  <div class="step-d">Store invoices, statements, and keep your finances clear.</div>
                 </div>
               </div>
               <div class="step">
                 <div class="step-n">3</div>
                 <div>
-                  <div class="step-t">Tax time chaos</div>
-                  <div class="step-d">Scattered documents and unclear reports when you need them most.</div>
+                  <div class="step-t">Export or get help</div>
+                  <div class="step-d">Generate accountant-ready packs or hire an accountant when needed.</div>
                 </div>
-              </div>
-            </div>
-          </section>
-
-          <section class="section" id="features">
-            <div class="section-title">Simple day-to-day. Accountant-ready on demand.</div>
-            <div class="section-subtitle">Start with personal finance, then go deeper only when you need more.</div>
-            <div class="feature-grid">
-              <div class="feature">
-                <h4>One place for documents</h4>
-                <p>Keep invoices and bank statements organized so you can find anything fast.</p>
-              </div>
-              <div class="feature">
-                <h4>Exports that make sense</h4>
-                <p>Generate a clean package so tax time becomes a checklist, not a panic.</p>
-              </div>
-              <div class="feature">
-                <h4>Upgrade only when needed</h4>
-                <p>Start free, then upgrade or cancel whenever your workflow changes.</p>
-              </div>
-              <div class="feature">
-                <h4>Backup + restore</h4>
-                <p>Move between devices with backup bundles (Standard+).</p>
-              </div>
-              <div class="feature">
-                <h4>Reporting tools</h4>
-                <p>Get clearer reports and filters so you can see where money goes.</p>
-              </div>
-              <div class="feature">
-                <h4>AI support (Pro)</h4>
-                <p>AI-assisted categorization and summaries for advanced workflows.</p>
               </div>
             </div>
           </section>
@@ -229,20 +182,20 @@
           </section>
 
           <section class="section" id="security">
-            <div class="section-title">Trust & privacy</div>
-            <div class="section-subtitle">Built for control. No tracking. No ads. No cloud required.</div>
+            <div class="section-title">Trust signals</div>
+            <div class="section-subtitle">Built for individuals and small businesses. Designed for privacy-first users.</div>
             <div class="security-grid">
               <div class="security-item">
-                <div class="security-t">No cloud required</div>
-                <div class="security-d">Your accounting data stays local and works offline.</div>
+                <div class="security-t">Local-first by design</div>
+                <div class="security-d">Works offline and keeps data on your device.</div>
               </div>
               <div class="security-item">
-                <div class="security-t">Account access</div>
-                <div class="security-d">Manage subscriptions and entitlements through a secure account portal.</div>
+                <div class="security-t">Privacy-first</div>
+                <div class="security-d">No ads, no tracking, and no selling your data.</div>
               </div>
               <div class="security-item">
-                <div class="security-t">Private by default</div>
-                <div class="security-d">No tracking, no ads, and no selling your data.</div>
+                <div class="security-t">Early access</div>
+                <div class="security-d">Alpha testing is ongoing. New features ship regularly.</div>
               </div>
             </div>
           </section>
@@ -250,7 +203,7 @@
 
         <section class="section" id="pricing">
           <div class="section-title">Pricing</div>
-          <div class="section-subtitle">Choose what fits today. Change it anytime.</div>
+          <div class="section-subtitle">Start free. Upgrade only when you need more.</div>
           <div class="pricing-points">
             <span class="pricing-point">Start free</span>
             <span class="pricing-point">Upgrade only when needed</span>
@@ -267,7 +220,7 @@
         <div class="plan-card">
           <div class="plan-header">
             <h3>Basic</h3>
-            <div class="plan-for">Best for starting out</div>
+            <div class="plan-for">Try it</div>
             <div class="price">€0</div>
             <p class="plan-desc">Simple personal finance and organization.</p>
           </div>
@@ -280,11 +233,10 @@
           <button class="btn btn-plan w-full" data-plan="basic" id="btnPlanBasic">Get Basic</button>
         </div>
 
-        <div class="plan-card highlight">
-          <div class="badge">Most Popular</div>
+        <div class="plan-card">
           <div class="plan-header">
-            <h3>Standard</h3>
-            <div class="plan-for">Best for personal finance</div>
+            <h3>Ordinary</h3>
+            <div class="plan-for">Personal use</div>
             <div class="price">
               <span class="priceMain" id="stdMainPrice">€165</span><span class="priceUnit" id="stdMainUnit">/yr</span>
             </div>
@@ -300,13 +252,14 @@
             <li>Expanded reporting tools</li>
             <li>AI assistant (basic)</li>
           </ul>
-          <button class="btn btn-primary w-full" data-plan="standard" id="btnPlanStandard">Get Standard (Yearly)</button>
+          <button class="btn btn-primary w-full" data-plan="standard" id="btnPlanStandard">Get Ordinary (Yearly)</button>
         </div>
 
-        <div class="plan-card">
+        <div class="plan-card highlight">
+          <div class="badge">Most Popular</div>
           <div class="plan-header">
             <h3>Pro</h3>
-            <div class="plan-for">For professionals</div>
+            <div class="plan-for">Best value</div>
             <div class="price">
               <span class="priceMain" id="proMainPrice">€539</span><span class="priceUnit" id="proMainUnit">/yr</span>
             </div>
@@ -474,6 +427,6 @@
     </div>
   </div>
 
-  <script src="portal.js?v=0.4.4"></script>
+  <script src="portal.js?v=0.4.5"></script>
 </body>
 </html>
