@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Kivana Account Portal</title>
-  <link rel="stylesheet" href="portal.css?v=0.2.4" />
+  <title>Kivana — Personal Finance & Accounting</title>
+  <meta name="description" content="Kivana helps you organize finances, store invoices and statements, and export accountant-ready reports. Manage your subscription and account in one place." />
+  <link rel="stylesheet" href="portal.css?v=0.3.0" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -30,6 +31,7 @@
     <!-- Auth View (Login / Signup) -->
     <div id="viewAuth" class="view hidden">
       <div class="card auth-card">
+        <button class="auth-back" id="btnBackToWebsite" type="button">← Back to website</button>
         <h2 id="authTitle">Sign in to Kivana</h2>
         <p id="authSubtitle" class="text-muted">Manage your Personal Finance app subscription.</p>
         
@@ -62,18 +64,38 @@
           <div class="hero">
             <div>
               <h2 class="hero-title">Personal Finance, simplified.</h2>
-              <p class="hero-subtitle">Keep your finances organized, store invoices and bank statements, and export a clean package for your accountant.</p>
+              <p class="hero-subtitle">A modern, accountant-friendly system to track finances, store invoices and statements, and export clean reports.</p>
               <div class="hero-ctas">
                 <button class="btn btn-primary" id="btnHeroCreate">Create account</button>
                 <button class="btn btn-secondary" id="btnHeroSignIn">Sign in</button>
               </div>
+              <div class="hero-badges">
+                <span class="badge-chip">Invoices</span>
+                <span class="badge-chip">Statements</span>
+                <span class="badge-chip">Exports</span>
+                <span class="badge-chip">Subscription</span>
+              </div>
             </div>
-            <div class="hero-card">
-              <div class="hero-points">
-                <div class="hero-point"><span class="dot"></span><span>Secure account + subscription portal</span></div>
-                <div class="hero-point"><span class="dot"></span><span>Choose Basic, Standard, Pro, or Lifetime</span></div>
-                <div class="hero-point"><span class="dot"></span><span>Manage plan upgrades and cancellations</span></div>
-                <div class="hero-point"><span class="dot"></span><span>Profile: display name + avatar</span></div>
+            <div class="hero-media">
+              <img
+                class="hero-image"
+                alt="Accounting workspace"
+                loading="lazy"
+                src="https://images.unsplash.com/photo-1554224155-1696413565d3?auto=format&fit=crop&w=1200&q=80"
+              />
+              <div class="hero-stats">
+                <div class="stat">
+                  <div class="stat-k">Fast exports</div>
+                  <div class="stat-v">Accountant-ready</div>
+                </div>
+                <div class="stat">
+                  <div class="stat-k">Documents</div>
+                  <div class="stat-v">Invoices + statements</div>
+                </div>
+                <div class="stat">
+                  <div class="stat-k">Control</div>
+                  <div class="stat-v">Upgrade / cancel anytime</div>
+                </div>
               </div>
             </div>
           </div>
@@ -105,6 +127,53 @@
               <div class="feature">
                 <h4>AI support (Pro)</h4>
                 <p>AI-assisted categorization and summaries for advanced workflows.</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="section" id="how">
+            <div class="section-title">How it works</div>
+            <div class="section-subtitle">A clean flow from documents → reports → export.</div>
+            <div class="steps">
+              <div class="step">
+                <div class="step-n">1</div>
+                <div class="step-b">
+                  <div class="step-t">Add your documents</div>
+                  <div class="step-d">Upload invoices and statements, keep everything organized by year and category.</div>
+                </div>
+              </div>
+              <div class="step">
+                <div class="step-n">2</div>
+                <div class="step-b">
+                  <div class="step-t">Track and review</div>
+                  <div class="step-d">Use reporting tools to spot trends, filter transactions, and stay on top of tax workflows.</div>
+                </div>
+              </div>
+              <div class="step">
+                <div class="step-n">3</div>
+                <div class="step-b">
+                  <div class="step-t">Export for your accountant</div>
+                  <div class="step-d">Generate an export pack that’s easy to share and easy to audit.</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="section" id="security">
+            <div class="section-title">Security & privacy</div>
+            <div class="section-subtitle">Designed to keep your account and data safe.</div>
+            <div class="security-grid">
+              <div class="security-item">
+                <div class="security-t">Token-based authentication</div>
+                <div class="security-d">Secure sessions with refresh tokens and scoped API access.</div>
+              </div>
+              <div class="security-item">
+                <div class="security-t">Plan enforcement</div>
+                <div class="security-d">Entitlements are checked server-side so features match your plan.</div>
+              </div>
+              <div class="security-item">
+                <div class="security-t">Account controls</div>
+                <div class="security-d">Manage your subscription, profile, and access from one portal.</div>
               </div>
             </div>
           </section>
@@ -218,6 +287,21 @@
               <div class="faq-q">What is Lifetime (Pro)? <span>+</span></div>
               <div class="faq-a">A one-time purchase for Pro features, intended for firms that prefer no subscription billing.</div>
             </div>
+            <div class="faq-item">
+              <div class="faq-q">How do upgrades work today? <span>+</span></div>
+              <div class="faq-a">For now, plan changes are applied instantly in the portal while the payment flow is being integrated.</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="cta">
+            <div class="cta-title">Ready to get organized?</div>
+            <div class="cta-subtitle">Create an account, choose a plan, and manage everything from a single portal.</div>
+            <div class="cta-actions">
+              <button class="btn btn-primary" id="btnCtaCreate">Create account</button>
+              <button class="btn btn-secondary" id="btnCtaSignIn">Sign in</button>
+            </div>
           </div>
         </section>
 
@@ -274,6 +358,6 @@
     </div>
   </div>
 
-  <script src="portal.js?v=0.2.5"></script>
+  <script src="portal.js?v=0.3.0"></script>
 </body>
 </html>

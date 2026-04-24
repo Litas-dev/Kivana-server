@@ -15,6 +15,9 @@ const els = {
   marketingFooter: document.getElementById('marketingFooter'),
   btnHeroCreate: document.getElementById('btnHeroCreate'),
   btnHeroSignIn: document.getElementById('btnHeroSignIn'),
+  btnCtaCreate: document.getElementById('btnCtaCreate'),
+  btnCtaSignIn: document.getElementById('btnCtaSignIn'),
+  btnBackToWebsite: document.getElementById('btnBackToWebsite'),
   footerYear: document.getElementById('footerYear'),
 
   authForm: document.getElementById('authForm'),
@@ -585,12 +588,39 @@ async function goToPublicSection(id) {
   if (isAuthed()) return
   pendingPlanSelection = null
   await showDashboard()
+  if (window.location.hash !== `#${id}`) window.location.hash = id
   setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0)
 }
 
 if (els.navFeatures) els.navFeatures.addEventListener('click', () => void goToPublicSection('features'))
 if (els.navPricing) els.navPricing.addEventListener('click', () => void goToPublicSection('pricing'))
 if (els.navFAQ) els.navFAQ.addEventListener('click', () => void goToPublicSection('faq'))
+if (els.btnCtaCreate) els.btnCtaCreate.addEventListener('click', () => {
+  pendingPlanSelection = null
+  setAuthMode(false)
+  void showAuth()
+})
+if (els.btnCtaSignIn) els.btnCtaSignIn.addEventListener('click', () => {
+  pendingPlanSelection = null
+  setAuthMode(true)
+  void showAuth()
+})
+if (els.btnBackToWebsite) els.btnBackToWebsite.addEventListener('click', () => {
+  pendingPlanSelection = null
+  void showDashboard()
+})
+
+async function applyHashNav() {
+  if (isAuthed()) return
+  const id = String(window.location.hash || '').replace(/^#/, '').trim()
+  if (!id) return
+  const allow = new Set(['features', 'pricing', 'faq', 'how', 'security'])
+  if (!allow.has(id)) return
+  await showDashboard()
+  setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0)
+}
+
+window.addEventListener('hashchange', () => void applyHashNav())
 
 document.querySelectorAll('.faq-q').forEach((q) => {
   q.addEventListener('click', () => {
@@ -638,4 +668,5 @@ if (els.avatarFile) {
     }
   }
   await showDashboard()
+  await applyHashNav()
 })()
