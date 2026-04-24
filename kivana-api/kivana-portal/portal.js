@@ -1,8 +1,11 @@
 const els = {
   viewAuth: document.getElementById('viewAuth'),
   viewDashboard: document.getElementById('viewDashboard'),
+  viewAccount: document.getElementById('viewAccount'),
   navUserEmail: document.getElementById('navUserEmail'),
   btnSignOut: document.getElementById('btnSignOut'),
+  btnNavPlans: document.getElementById('btnNavPlans'),
+  btnNavAccount: document.getElementById('btnNavAccount'),
 
   authForm: document.getElementById('authForm'),
   authTitle: document.getElementById('authTitle'),
@@ -30,15 +33,30 @@ const els = {
   proSubPrice: document.getElementById('proSubPrice'),
   proNote: document.getElementById('proNote'),
 
-  btnPlanBasic: document.getElementById('btnPlanBasic'),
-  btnPlanLifetime: document.getElementById('btnPlanLifetime')
+  displayName: document.getElementById('displayName'),
+  avatarFile: document.getElementById('avatarFile'),
+  avatarPreview: document.getElementById('avatarPreview'),
+  btnSaveProfile: document.getElementById('btnSaveProfile'),
+  profileStatus: document.getElementById('profileStatus'),
+
+  subPlanName: document.getElementById('subPlanName'),
+  subPlanMeta: document.getElementById('subPlanMeta'),
+  btnManagePlans: document.getElementById('btnManagePlans'),
+  btnCancelSub: document.getElementById('btnCancelSub'),
+  accountStatus: document.getElementById('accountStatus'),
 }
 
 let isLoginMode = true
 let billingCycle = 'yearly'
+let currentMe = null
+let currentEntitlement = null
 
-function getAccessToken() { return localStorage.getItem('kivanaPortal/accessToken') || '' }
-function getRefreshToken() { return localStorage.getItem('kivanaPortal/refreshToken') || '' }
+function getAccessToken() {
+  return localStorage.getItem('kivanaPortal/accessToken') || ''
+}
+function getRefreshToken() {
+  return localStorage.getItem('kivanaPortal/refreshToken') || ''
+}
 function setTokens(access, refresh) {
   if (access) localStorage.setItem('kivanaPortal/accessToken', access)
   if (refresh) localStorage.setItem('kivanaPortal/refreshToken', refresh)
@@ -48,26 +66,53 @@ function clearTokens() {
   localStorage.removeItem('kivanaPortal/refreshToken')
 }
 
-// Ensure base URL works whether running locally or on server
-const apiUrl = (path) => {
-  const origin = window.location.origin;
-  return `${origin}${path}`;
-};
+function normalizeApiBaseUrl(url) {
+  const v = String(url || '').trim()
+  if (!v) return ''
+  return v.endsWith('/') ? v.slice(0, -1) : v
+}
+
+function computeApiBaseUrl() {
+  const sp = new URLSearchParams(window.location.search)
+  const qp = sp.get('api')
+  if (qp) {
+    const v = normalizeApiBaseUrl(qp)
+    if (v) {
+      try {
+        localStorage.setItem('kivanaPortal/apiBase', v)
+      } catch {
+        void 0
+      }
+      return v
+    }
+  }
+  const saved = normalizeApiBaseUrl(localStorage.getItem('kivanaPortal/apiBase') || '')
+  if (saved) return saved
+  return window.location.origin
+}
+
+const apiBaseUrl = computeApiBaseUrl()
+const apiUrl = (path) => `${apiBaseUrl}${path}`
 
 async function apiFetch(path, init = {}) {
   const access = getAccessToken()
   const headers = new Headers(init.headers || {})
   headers.set('content-type', 'application/json')
   if (access) headers.set('authorization', `Bearer ${access}`)
-  
   const res = await fetch(apiUrl(path), { ...init, headers })
   if (res.ok) return res
-  
+
   let err = `HTTP ${res.status}`
+  if (res.status === 501) {
+    err = `Portal is running without the API. Open the portal from the API server (for example http://localhost:8080/portal/) or add ?api=http://localhost:8080 to this page URL.`
+    throw new Error(err)
+  }
   try {
     const j = await res.json()
     if (j && j.error) err = String(j.error)
-  } catch {}
+  } catch {
+    void 0
+  }
   throw new Error(err)
 }
 
@@ -77,6 +122,69 @@ async function refreshAccessToken() {
   const res = await apiFetch('/v1/auth/refresh', { method: 'POST', body: JSON.stringify({ refresh_token: refreshToken }) })
   const json = await res.json()
   setTokens(json.accessToken, json.refreshToken)
+}
+
+function profileKey(userId) {
+  return `kivanaPortal/profile/${userId}`
+}
+
+function loadProfileLocal(userId) {
+  try {
+    const raw = localStorage.getItem(profileKey(userId))
+    if (!raw) return { displayName: '', avatarDataUrl: '' }
+    const v = JSON.parse(raw)
+    if (!v || typeof v !== 'object') return { displayName: '', avatarDataUrl: '' }
+    return {
+      displayName: String(v.displayName || '').trim(),
+      avatarDataUrl: String(v.avatarDataUrl || '').trim(),
+    }
+  } catch {
+    return { displayName: '', avatarDataUrl: '' }
+  }
+}
+
+function saveProfileLocal(userId, patch) {
+  const cur = loadProfileLocal(userId)
+  const next = {
+    displayName: patch.displayName != null ? String(patch.displayName || '').trim() : cur.displayName,
+    avatarDataUrl: patch.avatarDataUrl != null ? String(patch.avatarDataUrl || '').trim() : cur.avatarDataUrl,
+  }
+  try {
+    localStorage.setItem(profileKey(userId), JSON.stringify(next))
+  } catch {
+    void 0
+  }
+  return next
+}
+
+function loadProfileMerged(me) {
+  if (!me || !me.id) return { displayName: '', avatarDataUrl: '' }
+  const local = loadProfileLocal(me.id)
+  const displayName = me.displayName != null ? String(me.displayName || '').trim() : local.displayName
+  const avatarDataUrl = me.avatarDataUrl != null ? String(me.avatarDataUrl || '').trim() : local.avatarDataUrl
+  return { displayName, avatarDataUrl }
+}
+
+async function updateProfileOnServer(patch) {
+  await apiFetch('/v1/profile', { method: 'POST', body: JSON.stringify(patch) })
+}
+
+function avatarPlaceholderDataUrl(text) {
+  const safe = encodeURIComponent(String(text || '').slice(0, 2).toUpperCase())
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="92" height="92"><rect width="92" height="92" fill="#E5E7EB"/><text x="50%" y="54%" text-anchor="middle" dominant-baseline="middle" font-family="Inter, system-ui" font-size="28" font-weight="700" fill="#111827">${safe}</text></svg>`
+  return `data:image/svg+xml;utf8,${svg}`
+}
+
+function showOnly(view) {
+  els.viewAuth.classList.toggle('hidden', view !== 'auth')
+  els.viewDashboard.classList.toggle('hidden', view !== 'dashboard')
+  els.viewAccount.classList.toggle('hidden', view !== 'account')
+
+  const authed = view !== 'auth'
+  els.navUserEmail.classList.toggle('hidden', !authed)
+  els.btnSignOut.classList.toggle('hidden', !authed)
+  els.btnNavPlans.classList.toggle('hidden', !authed)
+  els.btnNavAccount.classList.toggle('hidden', !authed)
 }
 
 function toggleAuthMode(e) {
@@ -93,7 +201,7 @@ function toggleAuthMode(e) {
     els.authTitle.textContent = 'Create an account'
     els.authSubtitle.textContent = 'Get started with your free Kivana account.'
     els.btnSubmitAuth.textContent = 'Sign up'
-    els.authToggleText.textContent = "Already have an account?"
+    els.authToggleText.textContent = 'Already have an account?'
     els.linkToggleAuth.textContent = 'Sign in'
   }
 }
@@ -119,24 +227,12 @@ async function handleAuthSubmit(e) {
 
   try {
     const endpoint = isLoginMode ? '/v1/auth/login' : '/v1/auth/signup'
-    const res = await apiFetch(endpoint, {
-      method: 'POST',
-      body: JSON.stringify({ email, password })
-    })
+    const res = await apiFetch(endpoint, { method: 'POST', body: JSON.stringify({ email, password }) })
     const json = await res.json()
     setTokens(json.accessToken, json.refreshToken)
-    
-    // Automatically select free plan on signup
-    if (!isLoginMode) {
-      await apiFetch('/v1/portal/select-plan', {
-        method: 'POST',
-        body: JSON.stringify({ planCode: 'basic' })
-      }).catch(err => console.log('Auto-grant basic failed:', err))
-    }
-
     await showDashboard()
   } catch (err) {
-    els.authError.textContent = err.message
+    els.authError.textContent = err && err.message ? err.message : 'Failed to sign in.'
   } finally {
     els.btnSubmitAuth.disabled = false
     els.btnSubmitAuth.textContent = isLoginMode ? 'Sign in' : 'Sign up'
@@ -148,10 +244,73 @@ async function loadMe() {
   return await res.json()
 }
 
-async function loadEntitlements() {
+async function loadEntitlement() {
   const res = await apiFetch('/v1/entitlements', { method: 'GET' })
   const json = await res.json()
-  return json.products.find(p => p.productCode === 'kivana')
+  const products = Array.isArray(json.products) ? json.products : []
+  return products.find((p) => p && p.productCode === 'kivana') || null
+}
+
+function setBusy(isBusy) {
+  document.querySelectorAll('.plans-grid button, .billingToggleBtn').forEach((b) => {
+    b.disabled = !!isBusy
+  })
+  if (els.btnManagePlans) els.btnManagePlans.disabled = !!isBusy
+  if (els.btnCancelSub) els.btnCancelSub.disabled = !!isBusy
+  if (els.btnSaveProfile) els.btnSaveProfile.disabled = !!isBusy
+}
+
+function resetPlanButtonLabels() {
+  const btnBasic = document.getElementById('btnPlanBasic')
+  const btnStd = document.getElementById('btnPlanStandard')
+  const btnPro = document.getElementById('btnPlanPro')
+  const btnLifetime = document.getElementById('btnPlanLifetime')
+  if (btnBasic) btnBasic.textContent = 'Get Basic'
+  if (btnLifetime) btnLifetime.textContent = 'Get Lifetime'
+  updatePricingUI()
+  if (btnStd && btnStd.textContent === 'Current plan') btnStd.textContent = billingCycle === 'yearly' ? 'Get Standard (Yearly)' : 'Get Standard (Monthly)'
+  if (btnPro && btnPro.textContent === 'Current plan') btnPro.textContent = billingCycle === 'yearly' ? 'Get Pro (Yearly)' : 'Get Pro (Monthly)'
+}
+
+function applyCurrentPlanUI() {
+  const planCode = currentEntitlement ? String(currentEntitlement.planCode || '').trim().toLowerCase() : ''
+  const planName = currentEntitlement ? String(currentEntitlement.planName || '').trim() : ''
+  const status = currentEntitlement ? String(currentEntitlement.status || '').trim() : ''
+  const endsAt = currentEntitlement ? currentEntitlement.endsAt : null
+
+  if (planName && status === 'active') {
+    els.currentPlanBanner.classList.remove('hidden')
+    els.lblCurrentPlan.textContent = planName
+  } else {
+    els.currentPlanBanner.classList.add('hidden')
+  }
+
+  document.querySelectorAll('.plan-card').forEach((c) => c.classList.remove('is-current'))
+  document.querySelectorAll('[data-plan]').forEach((btn) => {
+    btn.disabled = false
+  })
+
+  resetPlanButtonLabels()
+
+  if (planCode) {
+    const activeBtn = document.querySelector(`[data-plan="${planCode}"]`)
+    if (activeBtn) {
+      activeBtn.disabled = true
+      activeBtn.textContent = 'Current plan'
+      const card = activeBtn.closest('.plan-card')
+      if (card) card.classList.add('is-current')
+    }
+  }
+
+  if (els.subPlanName) els.subPlanName.textContent = planName || 'Basic'
+  if (els.subPlanMeta) {
+    const parts = []
+    if (status) parts.push(status)
+    if (endsAt) parts.push(`Ends: ${endsAt}`)
+    els.subPlanMeta.textContent = parts.length ? parts.join(' • ') : 'Active'
+  }
+  const isBasic = !planCode || planCode === 'basic'
+  if (els.btnCancelSub) els.btnCancelSub.classList.toggle('hidden', isBasic)
 }
 
 function setBillingCycle(next) {
@@ -160,10 +319,13 @@ function setBillingCycle(next) {
   billingCycle = v
   els.btnBillingYearly.classList.toggle('active', billingCycle === 'yearly')
   els.btnBillingMonthly.classList.toggle('active', billingCycle === 'monthly')
-  updatePricingUI()
+  applyCurrentPlanUI()
 }
 
 function updatePricingUI() {
+  const stdBtn = document.getElementById('btnPlanStandard')
+  const proBtn = document.getElementById('btnPlanPro')
+
   if (billingCycle === 'yearly') {
     els.stdMainPrice.textContent = '€165'
     els.stdMainUnit.textContent = '/yr'
@@ -173,10 +335,8 @@ function updatePricingUI() {
     els.proMainUnit.textContent = '/yr'
     els.proSubPrice.textContent = '€49/mo'
     els.proNote.textContent = 'Save 1 month with annual billing. €539 / year (1 month free).'
-    const stdBtn = document.getElementById('btnPlanStandard')
-    const proBtn = document.getElementById('btnPlanPro')
-    if (stdBtn) stdBtn.textContent = 'Get Standard (Yearly)'
-    if (proBtn) proBtn.textContent = 'Get Pro (Yearly)'
+    if (stdBtn && !stdBtn.disabled) stdBtn.textContent = 'Get Standard (Yearly)'
+    if (proBtn && !proBtn.disabled) proBtn.textContent = 'Get Pro (Yearly)'
   } else {
     els.stdMainPrice.textContent = '€15'
     els.stdMainUnit.textContent = '/mo'
@@ -186,90 +346,179 @@ function updatePricingUI() {
     els.proMainUnit.textContent = '/mo'
     els.proSubPrice.textContent = '€539/yr'
     els.proNote.textContent = 'Annual billing saves 1 month. €539 / year (1 month free).'
-    const stdBtn = document.getElementById('btnPlanStandard')
-    const proBtn = document.getElementById('btnPlanPro')
-    if (stdBtn) stdBtn.textContent = 'Get Standard (Monthly)'
-    if (proBtn) proBtn.textContent = 'Get Pro (Monthly)'
+    if (stdBtn && !stdBtn.disabled) stdBtn.textContent = 'Get Standard (Monthly)'
+    if (proBtn && !proBtn.disabled) proBtn.textContent = 'Get Pro (Monthly)'
   }
 }
 
-async function handleSelectPlan(payload) {
-  els.dashboardStatus.textContent = 'Processing...'
-  document.querySelectorAll('#viewDashboard button').forEach(b => b.disabled = true)
-  try {
-    await apiFetch('/v1/portal/select-plan', {
-      method: 'POST',
-      body: JSON.stringify(payload)
-    })
-    els.dashboardStatus.textContent = 'Plan updated successfully!'
-    await showDashboard()
-  } catch (err) {
-    els.dashboardStatus.textContent = `Error: ${err.message}`
-  } finally {
-    document.querySelectorAll('#viewDashboard button').forEach(b => b.disabled = false)
-    setTimeout(() => els.dashboardStatus.textContent = '', 3000)
-  }
+async function syncSessionData() {
+  currentMe = await loadMe()
+  currentEntitlement = await loadEntitlement()
+  els.navUserEmail.textContent = currentMe.email || ''
+  applyCurrentPlanUI()
+}
+
+function fillAccountProfile() {
+  if (!currentMe) return
+  const prof = loadProfileMerged(currentMe)
+  if (els.displayName) els.displayName.value = prof.displayName || ''
+  const initialSource = prof.displayName || currentMe.email || ''
+  if (els.avatarPreview) els.avatarPreview.src = prof.avatarDataUrl || avatarPlaceholderDataUrl(initialSource)
 }
 
 async function showDashboard() {
-  els.viewAuth.classList.add('hidden')
-  els.viewDashboard.classList.remove('hidden')
-  els.navUserEmail.classList.remove('hidden')
-  els.btnSignOut.classList.remove('hidden')
-
+  showOnly('dashboard')
+  els.dashboardStatus.textContent = ''
   try {
-    const me = await loadMe()
-    els.navUserEmail.textContent = me.email
-
-    const entitlement = await loadEntitlements()
-    if (entitlement && entitlement.status === 'active') {
-      els.currentPlanBanner.classList.remove('hidden')
-      els.lblCurrentPlan.textContent = entitlement.planName
-    } else {
-      els.currentPlanBanner.classList.add('hidden')
-    }
+    await syncSessionData()
   } catch (err) {
     console.error('Failed to load dashboard data:', err)
   }
 }
 
+async function showAccount() {
+  showOnly('account')
+  els.accountStatus.textContent = ''
+  els.profileStatus.textContent = ''
+  try {
+    await syncSessionData()
+    fillAccountProfile()
+  } catch (err) {
+    console.error('Failed to load account data:', err)
+  }
+}
+
 async function showAuth() {
-  els.viewAuth.classList.remove('hidden')
-  els.viewDashboard.classList.add('hidden')
-  els.navUserEmail.classList.add('hidden')
-  els.btnSignOut.classList.add('hidden')
+  showOnly('auth')
+  currentMe = null
+  currentEntitlement = null
+}
+
+async function handleSelectPlan(payload, statusEl) {
+  const currentCode = currentEntitlement ? String(currentEntitlement.planCode || '').trim().toLowerCase() : 'basic'
+  const nextCode = String(payload.planCode || '').trim().toLowerCase()
+  if (!nextCode || nextCode === currentCode) return
+
+  if (statusEl) statusEl.textContent = 'Processing...'
+  setBusy(true)
+  try {
+    await apiFetch('/v1/portal/select-plan', { method: 'POST', body: JSON.stringify(payload) })
+    if (statusEl) statusEl.textContent = 'Plan updated successfully!'
+    await syncSessionData()
+  } catch (err) {
+    if (statusEl) statusEl.textContent = `Error: ${err && err.message ? err.message : 'Failed.'}`
+  } finally {
+    setBusy(false)
+    if (statusEl) setTimeout(() => (statusEl.textContent = ''), 3000)
+  }
 }
 
 async function handleSignOut() {
   try {
     await apiFetch('/v1/auth/logout', { method: 'POST', body: JSON.stringify({ refresh_token: getRefreshToken() }) })
-  } catch {}
+  } catch {
+    void 0
+  }
   clearTokens()
   await showAuth()
 }
 
-// Bind Events
-els.linkToggleAuth.addEventListener('click', toggleAuthMode)
-els.authForm.addEventListener('submit', handleAuthSubmit)
-els.btnSignOut.addEventListener('click', handleSignOut)
+async function handleAvatarFile(file) {
+  if (!currentMe || !file) return
+  els.profileStatus.textContent = ''
+  setBusy(true)
+  try {
+    const dataUrl = await new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => resolve(String(reader.result || ''))
+      reader.onerror = () => reject(new Error('Failed to read image'))
+      reader.readAsDataURL(file)
+    })
+    if (dataUrl.length > 200_000) {
+      throw new Error('Image too large. Please use a smaller image.')
+    }
+    saveProfileLocal(currentMe.id, { avatarDataUrl: dataUrl })
+    try {
+      await updateProfileOnServer({ avatarDataUrl: dataUrl })
+      await syncSessionData()
+    } catch {
+      void 0
+    }
+    fillAccountProfile()
+    els.profileStatus.textContent = 'Avatar saved.'
+  } catch (err) {
+    els.profileStatus.textContent = err && err.message ? err.message : 'Failed to save avatar.'
+  } finally {
+    setBusy(false)
+    setTimeout(() => (els.profileStatus.textContent = ''), 2500)
+  }
+}
 
-els.btnBillingYearly.addEventListener('click', () => setBillingCycle('yearly'))
-els.btnBillingMonthly.addEventListener('click', () => setBillingCycle('monthly'))
+async function handleSaveProfile() {
+  if (!currentMe) return
+  if (!els.displayName) return
+  if (els.profileStatus) els.profileStatus.textContent = ''
+  setBusy(true)
+  try {
+    const displayName = String(els.displayName.value || '').trim()
+    saveProfileLocal(currentMe.id, { displayName })
+    try {
+      await updateProfileOnServer({ displayName })
+      await syncSessionData()
+    } catch {
+      void 0
+    }
+    fillAccountProfile()
+    if (els.profileStatus) els.profileStatus.textContent = 'Profile saved.'
+  } catch {
+    if (els.profileStatus) els.profileStatus.textContent = 'Failed to save profile.'
+  } finally {
+    setBusy(false)
+    if (els.profileStatus) setTimeout(() => (els.profileStatus.textContent = ''), 2500)
+  }
+}
+
+async function handleCancelSubscription() {
+  if (!currentEntitlement) return
+  const planCode = String(currentEntitlement.planCode || '').trim().toLowerCase()
+  if (planCode === 'basic') return
+  if (!window.confirm('Cancel your subscription and switch to Basic?')) return
+  await handleSelectPlan({ planCode: 'basic' }, els.accountStatus)
+}
+
+if (els.linkToggleAuth) els.linkToggleAuth.addEventListener('click', toggleAuthMode)
+if (els.authForm) els.authForm.addEventListener('submit', handleAuthSubmit)
+if (els.btnSignOut) els.btnSignOut.addEventListener('click', handleSignOut)
+if (els.btnNavPlans) els.btnNavPlans.addEventListener('click', () => void showDashboard())
+if (els.btnNavAccount) els.btnNavAccount.addEventListener('click', () => void showAccount())
+
+if (els.btnBillingYearly) els.btnBillingYearly.addEventListener('click', () => setBillingCycle('yearly'))
+if (els.btnBillingMonthly) els.btnBillingMonthly.addEventListener('click', () => setBillingCycle('monthly'))
 
 document.querySelectorAll('[data-plan]').forEach((el) => {
   el.addEventListener('click', () => {
     const planCode = String(el.getAttribute('data-plan') || '').trim()
     if (!planCode) return
     if (planCode === 'standard' || planCode === 'pro') {
-      void handleSelectPlan({ planCode, billingCycle })
+      void handleSelectPlan({ planCode, billingCycle }, els.dashboardStatus)
       return
     }
-    void handleSelectPlan({ planCode })
+    void handleSelectPlan({ planCode }, els.dashboardStatus)
   })
 })
 
-// Init
+if (els.btnManagePlans) els.btnManagePlans.addEventListener('click', () => void showDashboard())
+if (els.btnCancelSub) els.btnCancelSub.addEventListener('click', () => void handleCancelSubscription())
+if (els.btnSaveProfile) els.btnSaveProfile.addEventListener('click', () => void handleSaveProfile())
+if (els.avatarFile) {
+  els.avatarFile.addEventListener('change', (e) => {
+    const file = e && e.target && e.target.files ? e.target.files[0] : null
+    void handleAvatarFile(file)
+  })
+}
+
 ;(async () => {
+  setBillingCycle('yearly')
   if (getAccessToken()) {
     try {
       await refreshAccessToken()
@@ -281,5 +530,3 @@ document.querySelectorAll('[data-plan]').forEach((el) => {
   }
   await showAuth()
 })()
-
-setBillingCycle('yearly')
