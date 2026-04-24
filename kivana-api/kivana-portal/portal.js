@@ -580,9 +580,17 @@ if (els.btnHeroSignIn) els.btnHeroSignIn.addEventListener('click', () => {
   setAuthMode(true)
   void showAuth()
 })
-if (els.navFeatures) els.navFeatures.addEventListener('click', () => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
-if (els.navPricing) els.navPricing.addEventListener('click', () => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
-if (els.navFAQ) els.navFAQ.addEventListener('click', () => document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
+
+async function goToPublicSection(id) {
+  if (isAuthed()) return
+  pendingPlanSelection = null
+  await showDashboard()
+  setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0)
+}
+
+if (els.navFeatures) els.navFeatures.addEventListener('click', () => void goToPublicSection('features'))
+if (els.navPricing) els.navPricing.addEventListener('click', () => void goToPublicSection('pricing'))
+if (els.navFAQ) els.navFAQ.addEventListener('click', () => void goToPublicSection('faq'))
 
 document.querySelectorAll('.faq-q').forEach((q) => {
   q.addEventListener('click', () => {
