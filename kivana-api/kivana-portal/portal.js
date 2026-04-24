@@ -8,6 +8,14 @@ const els = {
   btnNavAccount: document.getElementById('btnNavAccount'),
   btnSignIn: document.getElementById('btnSignIn'),
   btnSignUp: document.getElementById('btnSignUp'),
+  navFeatures: document.getElementById('navFeatures'),
+  navPricing: document.getElementById('navPricing'),
+  navFAQ: document.getElementById('navFAQ'),
+  marketingSections: document.getElementById('marketingSections'),
+  marketingFooter: document.getElementById('marketingFooter'),
+  btnHeroCreate: document.getElementById('btnHeroCreate'),
+  btnHeroSignIn: document.getElementById('btnHeroSignIn'),
+  footerYear: document.getElementById('footerYear'),
 
   authForm: document.getElementById('authForm'),
   authTitle: document.getElementById('authTitle'),
@@ -193,6 +201,11 @@ function applyNav() {
   const authed = isAuthed()
   if (els.btnSignIn) els.btnSignIn.classList.toggle('hidden', authed)
   if (els.btnSignUp) els.btnSignUp.classList.toggle('hidden', authed)
+  if (els.navFeatures) els.navFeatures.classList.toggle('hidden', authed)
+  if (els.navPricing) els.navPricing.classList.toggle('hidden', authed)
+  if (els.navFAQ) els.navFAQ.classList.toggle('hidden', authed)
+  if (els.marketingSections) els.marketingSections.classList.toggle('hidden', authed)
+  if (els.marketingFooter) els.marketingFooter.classList.toggle('hidden', authed)
   els.navUserEmail.classList.toggle('hidden', !authed)
   els.btnSignOut.classList.toggle('hidden', !authed)
   els.btnNavPlans.classList.toggle('hidden', !authed)
@@ -399,6 +412,7 @@ async function showDashboard() {
   currentEntitlement = null
   els.currentPlanBanner.classList.add('hidden')
   applyCurrentPlanUI()
+  applyNav()
 }
 
 async function showAccount() {
@@ -556,6 +570,26 @@ if (els.btnSignUp) els.btnSignUp.addEventListener('click', () => {
   setAuthMode(false)
   void showAuth()
 })
+if (els.btnHeroCreate) els.btnHeroCreate.addEventListener('click', () => {
+  pendingPlanSelection = null
+  setAuthMode(false)
+  void showAuth()
+})
+if (els.btnHeroSignIn) els.btnHeroSignIn.addEventListener('click', () => {
+  pendingPlanSelection = null
+  setAuthMode(true)
+  void showAuth()
+})
+if (els.navFeatures) els.navFeatures.addEventListener('click', () => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
+if (els.navPricing) els.navPricing.addEventListener('click', () => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
+if (els.navFAQ) els.navFAQ.addEventListener('click', () => document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
+
+document.querySelectorAll('.faq-q').forEach((q) => {
+  q.addEventListener('click', () => {
+    const item = q.closest('.faq-item')
+    if (item) item.classList.toggle('open')
+  })
+})
 
 if (els.btnBillingYearly) els.btnBillingYearly.addEventListener('click', () => setBillingCycle('yearly'))
 if (els.btnBillingMonthly) els.btnBillingMonthly.addEventListener('click', () => setBillingCycle('monthly'))
@@ -585,6 +619,7 @@ if (els.avatarFile) {
 ;(async () => {
   setBillingCycle('yearly')
   applyNav()
+  if (els.footerYear) els.footerYear.textContent = String(new Date().getFullYear())
   if (getAccessToken()) {
     try {
       await refreshAccessToken()

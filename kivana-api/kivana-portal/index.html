@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Kivana Account Portal</title>
-  <link rel="stylesheet" href="portal.css?v=0.2.3" />
+  <link rel="stylesheet" href="portal.css?v=0.2.4" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -14,6 +14,10 @@
     <div id="navbar">
       <div class="logo">Kivana</div>
       <div class="nav-links">
+        <button class="nav-anchor" id="navFeatures">Features</button>
+        <button class="nav-anchor" id="navPricing">Pricing</button>
+        <button class="nav-anchor" id="navFAQ">FAQ</button>
+        <span class="nav-spacer"></span>
         <button id="btnSignIn" class="btn btn-secondary">Sign in</button>
         <button id="btnSignUp" class="btn btn-primary">Create account</button>
         <button id="btnNavPlans" class="btn btn-secondary hidden">Plans</button>
@@ -54,12 +58,66 @@
     <!-- Dashboard View (Plan Selection) -->
     <div id="viewDashboard" class="view active">
       <div class="dashboard-header">
-        <h2>Personal Finance, simplified</h2>
-        <p class="text-muted">Track your money, store invoices and bank statements, and export a clean package for your accountant.</p>
-        <div class="billingToggle" role="group" aria-label="Billing cycle">
-          <button type="button" class="billingToggleBtn active" id="btnBillingYearly" data-cycle="yearly">Yearly</button>
-          <button type="button" class="billingToggleBtn" id="btnBillingMonthly" data-cycle="monthly">Monthly</button>
+        <div id="marketingSections">
+          <div class="hero">
+            <div>
+              <h2 class="hero-title">Personal Finance, simplified.</h2>
+              <p class="hero-subtitle">Keep your finances organized, store invoices and bank statements, and export a clean package for your accountant.</p>
+              <div class="hero-ctas">
+                <button class="btn btn-primary" id="btnHeroCreate">Create account</button>
+                <button class="btn btn-secondary" id="btnHeroSignIn">Sign in</button>
+              </div>
+            </div>
+            <div class="hero-card">
+              <div class="hero-points">
+                <div class="hero-point"><span class="dot"></span><span>Secure account + subscription portal</span></div>
+                <div class="hero-point"><span class="dot"></span><span>Choose Basic, Standard, Pro, or Lifetime</span></div>
+                <div class="hero-point"><span class="dot"></span><span>Manage plan upgrades and cancellations</span></div>
+                <div class="hero-point"><span class="dot"></span><span>Profile: display name + avatar</span></div>
+              </div>
+            </div>
+          </div>
+
+          <section class="section" id="features">
+            <div class="section-title">Built for real workflows</div>
+            <div class="section-subtitle">From personal budgets to accountant-ready exports.</div>
+            <div class="feature-grid">
+              <div class="feature">
+                <h4>Invoices + statements</h4>
+                <p>Store invoices and bank statements in one place so you can find anything fast.</p>
+              </div>
+              <div class="feature">
+                <h4>Exports for accountants</h4>
+                <p>Export a clean package so tax time becomes a checklist, not a panic.</p>
+              </div>
+              <div class="feature">
+                <h4>Subscription control</h4>
+                <p>Upgrade, downgrade, or cancel your plan whenever you need.</p>
+              </div>
+              <div class="feature">
+                <h4>Backup + restore</h4>
+                <p>Move between devices with backup bundles (Standard+).</p>
+              </div>
+              <div class="feature">
+                <h4>Reporting tools</h4>
+                <p>Get clearer reports and filters so you can see where money goes.</p>
+              </div>
+              <div class="feature">
+                <h4>AI support (Pro)</h4>
+                <p>AI-assisted categorization and summaries for advanced workflows.</p>
+              </div>
+            </div>
+          </section>
         </div>
+
+        <section class="section" id="pricing">
+          <div class="section-title">Pricing</div>
+          <div class="section-subtitle">Pick a plan that matches your workflow — from personal to professional.</div>
+          <div class="billingToggle" role="group" aria-label="Billing cycle">
+            <button type="button" class="billingToggleBtn active" id="btnBillingYearly" data-cycle="yearly">Yearly</button>
+            <button type="button" class="billingToggleBtn" id="btnBillingMonthly" data-cycle="monthly">Monthly</button>
+          </div>
+        </section>
       </div>
 
       <div class="plans-grid">
@@ -142,6 +200,34 @@
         Your current plan: <strong id="lblCurrentPlan">...</strong>
       </div>
       <div id="dashboardStatus" class="status-msg"></div>
+
+      <div id="marketingFooter">
+        <section class="section" id="faq">
+          <div class="section-title">FAQ</div>
+          <div class="section-subtitle">Quick answers to common questions.</div>
+          <div class="faq">
+            <div class="faq-item">
+              <div class="faq-q">Do I need a subscription to use Kivana? <span>+</span></div>
+              <div class="faq-a">You can start with Basic for free. Upgrade any time for advanced features.</div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-q">Can I cancel whenever I want? <span>+</span></div>
+              <div class="faq-a">Yes. You can switch back to Basic from the Account page.</div>
+            </div>
+            <div class="faq-item">
+              <div class="faq-q">What is Lifetime (Pro)? <span>+</span></div>
+              <div class="faq-a">A one-time purchase for Pro features, intended for firms that prefer no subscription billing.</div>
+            </div>
+          </div>
+        </section>
+
+        <div class="footer">
+          <div>© <span id="footerYear"></span> Kivana</div>
+          <div>
+            <a href="#pricing" id="footerPricing">Pricing</a>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div id="viewAccount" class="view hidden">
@@ -188,6 +274,6 @@
     </div>
   </div>
 
-  <script src="portal.js?v=0.2.3"></script>
+  <script src="portal.js?v=0.2.4"></script>
 </body>
 </html>
