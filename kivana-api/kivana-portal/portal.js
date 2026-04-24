@@ -45,7 +45,9 @@ const els = {
   btnHeroViewPlans: document.getElementById('btnHeroViewPlans'),
   btnCtaCreate: document.getElementById('btnCtaCreate'),
   btnCtaSignIn: document.getElementById('btnCtaSignIn'),
-  btnCtaDownload: document.getElementById('btnCtaDownload'),
+  btnCtaDownloadMac: document.getElementById('btnCtaDownloadMac'),
+  btnCtaDownloadWin: document.getElementById('btnCtaDownloadWin'),
+  btnCtaViewPlans: document.getElementById('btnCtaViewPlans'),
   btnAccountantService: document.getElementById('btnAccountantService'),
   btnBackToWebsite: document.getElementById('btnBackToWebsite'),
   footerYear: document.getElementById('footerYear'),
@@ -292,7 +294,7 @@ function toggleAuthMode(e) {
     els.linkToggleAuth.textContent = 'Create one'
   } else {
     els.authTitle.textContent = 'Create an account'
-    els.authSubtitle.textContent = 'Get started with your free Kivana account.'
+    els.authSubtitle.textContent = 'Create an account, then choose a trial or plan.'
     els.btnSubmitAuth.textContent = 'Sign up'
     els.authToggleText.textContent = 'Already have an account?'
     els.linkToggleAuth.textContent = 'Sign in'
@@ -363,7 +365,7 @@ function resetPlanButtonLabels() {
   const btnStd = document.getElementById('btnPlanStandard')
   const btnPro = document.getElementById('btnPlanPro')
   const btnLifetime = document.getElementById('btnPlanLifetime')
-  if (btnBasic) btnBasic.textContent = 'Start Free'
+  if (btnBasic) btnBasic.textContent = 'Start 14-day trial'
   if (btnLifetime) btnLifetime.textContent = 'Get Lifetime'
   updatePricingUI()
   if (btnStd && btnStd.textContent === 'Current plan') btnStd.textContent = billingCycle === 'yearly' ? 'Get Ordinary (Yearly)' : 'Get Ordinary (Monthly)'
@@ -400,12 +402,12 @@ function applyCurrentPlanUI() {
     }
   }
 
-  if (els.subPlanName) els.subPlanName.textContent = planName || 'Basic'
+  if (els.subPlanName) els.subPlanName.textContent = planName || (planCode ? planCode : 'No active plan')
   if (els.subPlanMeta) {
     const parts = []
     if (status) parts.push(status)
     if (endsAt) parts.push(`Ends: ${endsAt}`)
-    els.subPlanMeta.textContent = parts.length ? parts.join(' • ') : 'Active'
+    els.subPlanMeta.textContent = parts.length ? parts.join(' • ') : (planCode ? 'Active' : 'Choose a plan to continue.')
   }
   const isBasic = !planCode || planCode === 'basic'
   if (els.btnCancelSub) els.btnCancelSub.classList.toggle('hidden', isBasic)
@@ -470,6 +472,11 @@ async function showDashboard() {
   if (isAuthed()) {
     try {
       await syncSessionData()
+      if (!currentEntitlement) {
+        showMarketingStatus('Choose your plan: start a 14-day trial or buy a plan.')
+        if (window.location.hash !== '#pricing') window.location.hash = 'pricing'
+        setTimeout(() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0)
+      }
       return
     } catch (err) {
       console.error('Failed to load dashboard data:', err)
@@ -514,7 +521,7 @@ async function handleSelectPlan(payload, statusEl) {
     await showAuth()
     return
   }
-  const currentCode = currentEntitlement ? String(currentEntitlement.planCode || '').trim().toLowerCase() : 'basic'
+  const currentCode = currentEntitlement ? String(currentEntitlement.planCode || '').trim().toLowerCase() : ''
   const nextCode = String(payload.planCode || '').trim().toLowerCase()
   if (!nextCode || nextCode === currentCode) return
 
@@ -635,7 +642,7 @@ function setAuthMode(loginMode) {
     els.linkToggleAuth.textContent = 'Create one'
   } else {
     els.authTitle.textContent = 'Create an account'
-    els.authSubtitle.textContent = 'Get started with your free Kivana account.'
+    els.authSubtitle.textContent = 'Create an account, then choose a trial or plan.'
     els.btnSubmitAuth.textContent = 'Sign up'
     els.authToggleText.textContent = 'Already have an account?'
     els.linkToggleAuth.textContent = 'Sign in'
@@ -665,7 +672,7 @@ async function goToPublicSection(id) {
 
 function startFree() {
   if (isAuthed()) return
-  pendingPlanSelection = { planCode: 'basic' }
+  pendingPlanSelection = null
   setAuthMode(false)
   closeMenu()
   void showAuth()
@@ -677,6 +684,7 @@ if (els.navSecurity) els.navSecurity.addEventListener('click', () => void goToPu
 if (els.navResources) els.navResources.addEventListener('click', () => void goToPublicSection('preview'))
 if (els.navAccountants) els.navAccountants.addEventListener('click', () => void goToPublicSection('different'))
 if (els.btnCtaCreate) els.btnCtaCreate.addEventListener('click', startFree)
+if (els.btnCtaViewPlans) els.btnCtaViewPlans.addEventListener('click', () => void goToPublicSection('pricing'))
 if (els.btnCtaSignIn) els.btnCtaSignIn.addEventListener('click', () => {
   pendingPlanSelection = null
   setAuthMode(true)
@@ -724,14 +732,14 @@ if (els.mSignOut) els.mSignOut.addEventListener('click', () => {
 if (els.btnHeroStartFree) els.btnHeroStartFree.addEventListener('click', startFree)
 if (els.btnHeroViewPlans) els.btnHeroViewPlans.addEventListener('click', () => void goToPublicSection('pricing'))
 if (els.btnAccountantService) els.btnAccountantService.addEventListener('click', startFree)
-if (els.btnCtaDownload) {
-  els.btnCtaDownload.addEventListener('click', () => {
-    const ua = String(navigator.userAgent || '')
-    const isWin = /\bWindows\b/i.test(ua) || /\bWin64\b/i.test(ua) || /\bWin32\b/i.test(ua)
-    setSelectedOs(isWin ? 'win' : 'mac')
-    void handleDownloadClick()
-  })
-}
+if (els.btnCtaDownloadMac) els.btnCtaDownloadMac.addEventListener('click', () => {
+  setSelectedOs('mac')
+  void handleDownloadClick()
+})
+if (els.btnCtaDownloadWin) els.btnCtaDownloadWin.addEventListener('click', () => {
+  setSelectedOs('win')
+  void handleDownloadClick()
+})
 
 let selectedOs = 'mac'
 function setSelectedOs(os) {

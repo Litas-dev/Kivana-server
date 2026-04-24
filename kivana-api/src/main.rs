@@ -294,10 +294,6 @@ async fn signup(
         Err(_) => return err(StatusCode::INTERNAL_SERVER_ERROR, "db_error").into_response(),
     }
 
-    if ensure_free_plan(&state.pool, user_id).await.is_err() {
-        return err(StatusCode::INTERNAL_SERVER_ERROR, "licensing_error").into_response();
-    }
-
     let tokens = issue_tokens(&state, user_id, &email).await;
     match tokens {
         Ok(v) => (StatusCode::OK, Json(v)).into_response(),
@@ -690,15 +686,21 @@ async fn portal_select_plan(
         _ => return err(StatusCode::NOT_FOUND, "plan_not_found").into_response(),
     };
 
-    // Set the end date appropriately
-    let ends_at = match req.plan_code.as_str() {
-        "basic" | "lifetime_pro" => None,
-        "standard" | "pro" => {
-            let days = if billing_cycle == "yearly" { 365 } else { 30 };
-            Some(OffsetDateTime::now_utc() + Duration::days(days))
+    if plan_code == "basic" {
+        let existing = sqlx::query(
+            "SELECT 1 FROM subscriptions WHERE user_id = $1 AND product_id = $2 LIMIT 1",
+        )
+        .bind(user_id)
+        .bind(product_id)
+        .fetch_optional(&state.pool)
+        .await;
+
+        match existing {
+            Ok(Some(_)) => return err(StatusCode::FORBIDDEN, "trial_already_used").into_response(),
+            Ok(None) => {}
+            Err(_) => return err(StatusCode::INTERNAL_SERVER_ERROR, "db_error").into_response(),
         }
-        _ => None,
-    };
+    }
 
     let tx = state.pool.begin().await;
     let mut tx = match tx {
@@ -714,18 +716,32 @@ async fn portal_select_plan(
     .execute(&mut *tx)
     .await;
 
+    let (ends_at, trial_ends_at) = match plan_code.as_str() {
+        "basic" => {
+            let trial_end = now + Duration::days(14);
+            (Some(trial_end), Some(trial_end))
+        }
+        "standard" | "pro" => {
+            let days = if billing_cycle == "yearly" { 365 } else { 30 };
+            (Some(now + Duration::days(days)), None)
+        }
+        "lifetime_pro" => (None, None),
+        _ => (None, None),
+    };
+
     let sub_id = Uuid::new_v4();
     let inserted = sqlx::query(
-    "INSERT INTO subscriptions (id, user_id, product_id, plan_id, status, started_at, ends_at) VALUES ($1,$2,$3,$4,'active',$5,$6)",
-  )
-  .bind(sub_id)
-  .bind(user_id)
-  .bind(product_id)
-  .bind(plan_id)
-  .bind(now)
-  .bind(ends_at)
-  .execute(&mut *tx)
-  .await;
+        "INSERT INTO subscriptions (id, user_id, product_id, plan_id, status, started_at, ends_at, trial_ends_at) VALUES ($1,$2,$3,$4,'active',$5,$6,$7)",
+    )
+    .bind(sub_id)
+    .bind(user_id)
+    .bind(product_id)
+    .bind(plan_id)
+    .bind(now)
+    .bind(ends_at)
+    .bind(trial_ends_at)
+    .execute(&mut *tx)
+    .await;
 
     if inserted.is_err() {
         return err(StatusCode::INTERNAL_SERVER_ERROR, "db_error").into_response();
@@ -1100,6 +1116,7 @@ fn verify_password(password: &str, password_hash: &str) -> bool {
         .is_ok()
 }
 
+#[allow(clippy::result_large_err)]
 fn access_user_id(
     state: &AppState,
     headers: &axum::http::HeaderMap,
@@ -1142,47 +1159,6 @@ async fn require_admin(
     if !is_admin {
         return Err(err(StatusCode::FORBIDDEN, "forbidden").into_response());
     }
-    Ok(())
-}
-
-async fn ensure_free_plan(pool: &PgPool, user_id: Uuid) -> anyhow::Result<()> {
-    let product_code = "kivana";
-    let plan_code = "basic";
-
-    let r = sqlx::query(
-        r#"
-      SELECT p.id AS product_id, pl.id AS plan_id
-      FROM products p
-      JOIN plans pl ON pl.product_id = p.id
-      WHERE p.code = $1 AND pl.code = $2
-      LIMIT 1
-    "#,
-    )
-    .bind(product_code)
-    .bind(plan_code)
-    .fetch_one(pool)
-    .await?;
-
-    let product_id: Uuid = r.get("product_id");
-    let plan_id: Uuid = r.get("plan_id");
-
-    let now = OffsetDateTime::now_utc();
-    let sub_id = Uuid::new_v4();
-    let _ = sqlx::query(
-        r#"
-      INSERT INTO subscriptions (id, user_id, product_id, plan_id, status, started_at)
-      VALUES ($1, $2, $3, $4, 'active', $5)
-      ON CONFLICT (user_id, product_id) WHERE status = 'active' DO NOTHING
-    "#,
-    )
-    .bind(sub_id)
-    .bind(user_id)
-    .bind(product_id)
-    .bind(plan_id)
-    .bind(now)
-    .execute(pool)
-    .await?;
-
     Ok(())
 }
 

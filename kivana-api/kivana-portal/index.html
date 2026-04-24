@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Kivana — Personal Finance & Accounting</title>
   <meta name="description" content="Kivana is local-first personal finance and accounting software. Your data stays on your device, with flexible plans and accountant-ready exports when you need them." />
-  <link rel="stylesheet" href="portal.css?v=0.4.7" />
+  <link rel="stylesheet" href="portal.css?v=0.4.10" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -28,7 +28,7 @@
             <button type="button" class="os-btn" id="osWin">Windows</button>
           </div>
           <button id="btnSignIn" class="btn btn-secondary">Sign in</button>
-          <button id="btnSignUp" class="btn btn-primary">Start Free</button>
+          <button id="btnSignUp" class="btn btn-primary">Create account</button>
         </div>
         <button class="nav-menu-btn" id="btnMenu" type="button" aria-label="Open menu" aria-expanded="false">☰</button>
         <button id="btnNavPlans" class="btn btn-secondary hidden">Plans</button>
@@ -61,7 +61,7 @@
             <button type="button" class="os-btn" id="mOsWin">Windows</button>
           </div>
           <button class="btn btn-secondary w-full" id="mSignIn">Sign in</button>
-          <button class="btn btn-primary w-full" id="mGetKivana">Start Free</button>
+          <button class="btn btn-primary w-full" id="mGetKivana">Create account</button>
         </div>
         <div class="mobile-menu-actions hidden" id="mobileMenuAuthedActions">
           <button class="btn btn-secondary w-full" id="mSignOut">Sign out</button>
@@ -105,23 +105,27 @@
         <div id="marketingSections">
           <div class="hero hero-solo">
             <div>
-              <h2 class="hero-title">Your finances.<br/>On your device.</h2>
-              <p class="hero-subtitle">Simple accounting and personal finance with flexible plans and on-demand accountants.</p>
+              <h2 class="hero-title">Your finances. On your device.</h2>
+              <p class="hero-subtitle">Local-first accounting with flexible plans and on-demand accountants.</p>
               <div class="hero-ctas">
-                <button class="btn btn-primary btn-hero" id="btnHeroStartFree">Start Free</button>
+                <button class="btn btn-primary btn-hero" id="btnHeroStartFree">Create account</button>
                 <button class="btn btn-secondary btn-hero" id="btnHeroViewPlans">View Plans</button>
               </div>
-              <ul class="hero-bullets">
-                <li>No forced cloud</li>
-                <li>Pay only for what you need</li>
-                <li>Hire an accountant in one click</li>
-              </ul>
             </div>
+          </div>
+
+          <div class="clarity-strip" aria-label="Key guarantees">
+            <div class="clarity-item">No forced cloud</div>
+            <div class="clarity-item">Pay only for what you use</div>
+            <div class="clarity-item">Hire an accountant anytime</div>
+          </div>
+
+          <div class="trust-strip" aria-label="Trust">
+            Built for individuals and small businesses • Privacy-first • No lock-in
           </div>
 
           <section class="section" id="benefits">
             <div class="section-title">3 core benefits</div>
-            <div class="section-subtitle">Everything else supports these. Nothing else competes with them.</div>
             <div class="benefits-grid">
               <div class="benefit-card">
                 <div class="benefit-title">Full control</div>
@@ -153,7 +157,7 @@
                 <div class="step-n">2</div>
                 <div>
                   <div class="step-t">Upgrade only when needed</div>
-                  <div class="step-d">Start free. Move up when your workflow grows.</div>
+                  <div class="step-d">Start a 14-day trial. Move up when your workflow grows.</div>
                 </div>
               </div>
               <div class="step">
@@ -204,20 +208,20 @@
             <div class="section-subtitle">This is the edge: privacy-first control with optional services.</div>
             <div class="diff-grid">
               <div class="diff-card">
-                <div class="diff-title">Works locally</div>
-                <div class="diff-desc">Your data stays on your device.</div>
+                <div class="diff-title">Works locally — your data stays with you</div>
+                <div class="diff-desc">Run it on your device first.</div>
               </div>
               <div class="diff-card">
-                <div class="diff-title">No forced cloud</div>
-                <div class="diff-desc">No account dependency to use the product.</div>
+                <div class="diff-title">Optional cloud — only if you choose</div>
+                <div class="diff-desc">Add cloud features when you want them.</div>
               </div>
               <div class="diff-card">
-                <div class="diff-title">No lock-in</div>
-                <div class="diff-desc">Flexible plans you control.</div>
+                <div class="diff-title">No lock-in — flexible plans</div>
+                <div class="diff-desc">Upgrade only when you need more.</div>
               </div>
               <div class="diff-card">
-                <div class="diff-title">Pay only for what you use</div>
-                <div class="diff-desc">Start free and upgrade anytime.</div>
+                <div class="diff-title">On-demand accountant — no long-term commitment</div>
+                <div class="diff-desc">Get help when you need it.</div>
               </div>
             </div>
           </section>
@@ -225,9 +229,9 @@
 
         <section class="section" id="pricing">
           <div class="section-title">Pricing</div>
-          <div class="section-subtitle">Start free. Upgrade anytime.</div>
+          <div class="section-subtitle">Start with a 14-day free trial. Upgrade only when you need more.</div>
           <div class="pricing-points">
-            <span class="pricing-point">Start free</span>
+            <span class="pricing-point">14-day free trial</span>
             <span class="pricing-point">Upgrade only when needed</span>
             <span class="pricing-point">Accountant-ready exports</span>
           </div>
@@ -241,23 +245,23 @@
       <div class="plans-grid">
         <div class="plan-card">
           <div class="plan-header">
-            <h3>Free</h3>
-            <div class="plan-for">Try it</div>
+            <h3>Trial</h3>
+            <div class="plan-for">14 days</div>
             <div class="price">€0</div>
-            <p class="plan-desc">Personal finance and simple accounting.</p>
+            <p class="plan-desc">Try personal finance and simple accounting. Upgrade after your trial ends.</p>
           </div>
           <ul class="features">
             <li>Track income and expenses</li>
             <li>Store invoices and statements</li>
             <li>Export an accountant-ready pack</li>
           </ul>
-          <button class="btn btn-plan w-full" data-plan="basic" id="btnPlanBasic">Start Free</button>
+          <button class="btn btn-plan w-full" data-plan="basic" id="btnPlanBasic">Start 14-day trial</button>
         </div>
 
         <div class="plan-card">
           <div class="plan-header">
             <h3>Ordinary</h3>
-            <div class="plan-for">Personal</div>
+            <div class="plan-for">Personal use</div>
             <div class="price">
               <span class="priceMain" id="stdMainPrice">€165</span><span class="priceUnit" id="stdMainUnit">/yr</span>
             </div>
@@ -266,7 +270,7 @@
             <p class="plan-desc">More control when your workflow grows.</p>
           </div>
           <ul class="features">
-            <li>Everything in Free</li>
+            <li>Everything in Trial</li>
             <li>Better reports and backup tools</li>
             <li>Upgrade any time</li>
           </ul>
@@ -296,7 +300,7 @@
         <div class="plan-card plan-card-service">
           <div class="plan-header">
             <h3>Accountant</h3>
-            <div class="plan-for">Professional</div>
+            <div class="plan-for">Full support</div>
             <div class="price">On demand</div>
             <p class="plan-desc">Professional help when you need it.</p>
           </div>
@@ -305,7 +309,7 @@
             <li>Fast support when needed</li>
             <li>No subscription required</li>
           </ul>
-          <button class="btn btn-secondary w-full" id="btnAccountantService">Start Free</button>
+          <button class="btn btn-secondary w-full" id="btnAccountantService">Create account</button>
         </div>
       </div>
 
@@ -317,11 +321,14 @@
       <div id="marketingFooter">
         <section class="section">
           <div class="cta">
-          <div class="cta-title">Take control of your finances.</div>
-          <div class="cta-subtitle">Start free now. Download when you’re ready.</div>
+          <div class="cta-title">Create account — No Risk</div>
+          <div class="cta-subtitle">Upgrade only when you need more.</div>
+          <div class="cta-urgency">Start your trial in seconds</div>
+          <div class="cta-urgency">No commitment</div>
+          <div class="cta-urgency">Upgrade anytime</div>
             <div class="cta-actions">
-            <button class="btn btn-primary btn-hero" id="btnCtaCreate">Start Free</button>
-            <button class="btn btn-secondary" id="btnCtaDownload">Download</button>
+            <button class="btn btn-primary btn-hero" id="btnCtaCreate">Create account</button>
+            <button class="btn btn-secondary" id="btnCtaViewPlans">View Plans</button>
             </div>
           </div>
         </section>
@@ -379,6 +386,6 @@
     </div>
   </div>
 
-  <script src="portal.js?v=0.4.7"></script>
+  <script src="portal.js?v=0.4.10"></script>
 </body>
 </html>
