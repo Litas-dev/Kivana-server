@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Kivana — Personal Finance & Accounting</title>
   <meta name="description" content="Kivana helps you organize finances, store invoices and statements, and export accountant-ready reports. Manage your subscription and account in one place." />
-  <link rel="stylesheet" href="portal.css?v=0.4.0" />
+  <link rel="stylesheet" href="portal.css?v=0.4.1" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -30,11 +30,44 @@
           <button id="btnSignIn" class="btn btn-secondary">Sign in</button>
           <button id="btnSignUp" class="btn btn-primary">Get Kivana</button>
         </div>
+        <button class="nav-menu-btn" id="btnMenu" type="button" aria-label="Open menu" aria-expanded="false">☰</button>
         <button id="btnNavPlans" class="btn btn-secondary hidden">Plans</button>
         <button id="btnNavAccount" class="btn btn-secondary hidden">Account</button>
         <span id="navUserEmail" class="hidden"></span>
         <button id="btnSignOut" class="btn btn-secondary hidden">Sign out</button>
       </div>
+    </div>
+
+    <div class="mobile-menu hidden" id="mobileMenu" role="dialog" aria-modal="true" aria-label="Menu">
+      <div class="mobile-menu-panel">
+        <div class="mobile-menu-top">
+          <div class="mobile-menu-title">Menu</div>
+          <button class="mobile-menu-close" id="btnCloseMenu" type="button" aria-label="Close menu">✕</button>
+        </div>
+        <div class="mobile-menu-links" id="mobileMenuPublic">
+          <button class="mobile-menu-link" id="mNavFeatures">Features</button>
+          <button class="mobile-menu-link" id="mNavPricing">Pricing</button>
+          <button class="mobile-menu-link" id="mNavAccountants">For Accountants</button>
+          <button class="mobile-menu-link" id="mNavSecurity">Security</button>
+          <button class="mobile-menu-link" id="mNavResources">Resources</button>
+        </div>
+        <div class="mobile-menu-links hidden" id="mobileMenuAuthed">
+          <button class="mobile-menu-link" id="mPlans">Plans</button>
+          <button class="mobile-menu-link" id="mAccount">Account</button>
+        </div>
+        <div class="mobile-menu-actions" id="mobileMenuPublicActions">
+          <div class="os-toggle" id="mOsToggle">
+            <button type="button" class="os-btn active" id="mOsMac">macOS</button>
+            <button type="button" class="os-btn" id="mOsWin">Windows</button>
+          </div>
+          <button class="btn btn-secondary w-full" id="mSignIn">Sign in</button>
+          <button class="btn btn-primary w-full" id="mGetKivana">Get Kivana</button>
+        </div>
+        <div class="mobile-menu-actions hidden" id="mobileMenuAuthedActions">
+          <button class="btn btn-secondary w-full" id="mSignOut">Sign out</button>
+        </div>
+      </div>
+      <div class="mobile-menu-backdrop" id="menuBackdrop"></div>
     </div>
 
     <!-- Auth View (Login / Signup) -->
@@ -143,29 +176,20 @@
 
           <section class="section" id="accountants">
             <div class="section-title">For accountants</div>
-            <div class="section-subtitle">Make client work faster with consistent exports and clean reporting.</div>
-            <div class="steps">
-              <div class="step">
-                <div class="step-n">1</div>
-                <div class="step-b">
-                  <div class="step-t">Collect everything</div>
-                  <div class="step-d">Invoices, statements, and documents stay organized and easy to review.</div>
-                </div>
-              </div>
-              <div class="step">
-                <div class="step-n">2</div>
-                <div class="step-b">
-                  <div class="step-t">Review and reconcile</div>
-                  <div class="step-d">Use filters and reporting tools to catch issues early and reduce back-and-forth.</div>
-                </div>
-              </div>
-              <div class="step">
-                <div class="step-n">3</div>
-                <div class="step-b">
-                  <div class="step-t">Export packs</div>
-                  <div class="step-d">Generate a client-ready export pack for tax-year reporting and archives.</div>
-                </div>
-              </div>
+            <div class="section-subtitle">Simple for individuals. Detailed tools when a professional needs them.</div>
+            <div class="details-grid">
+              <details class="details-card">
+                <summary>Client-ready export packs</summary>
+                <div class="details-body">Generate a clean export pack that’s easy to share, archive, and review for tax-year reporting.</div>
+              </details>
+              <details class="details-card">
+                <summary>Fewer questions, faster reviews</summary>
+                <div class="details-body">Invoices, statements, and reports stay in one place, so review time goes down and context is preserved.</div>
+              </details>
+              <details class="details-card">
+                <summary>Reporting that matches real workflows</summary>
+                <div class="details-body">Filters and reporting help you reconcile quickly and catch issues earlier.</div>
+              </details>
             </div>
           </section>
 
@@ -387,6 +411,6 @@
     </div>
   </div>
 
-  <script src="portal.js?v=0.4.0"></script>
+  <script src="portal.js?v=0.4.1"></script>
 </body>
 </html>

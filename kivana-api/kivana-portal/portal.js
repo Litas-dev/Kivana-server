@@ -8,6 +8,24 @@ const els = {
   btnNavAccount: document.getElementById('btnNavAccount'),
   btnSignIn: document.getElementById('btnSignIn'),
   btnSignUp: document.getElementById('btnSignUp'),
+  btnMenu: document.getElementById('btnMenu'),
+  mobileMenu: document.getElementById('mobileMenu'),
+  btnCloseMenu: document.getElementById('btnCloseMenu'),
+  menuBackdrop: document.getElementById('menuBackdrop'),
+  mobileMenuPublic: document.getElementById('mobileMenuPublic'),
+  mobileMenuAuthed: document.getElementById('mobileMenuAuthed'),
+  mobileMenuPublicActions: document.getElementById('mobileMenuPublicActions'),
+  mobileMenuAuthedActions: document.getElementById('mobileMenuAuthedActions'),
+  mNavFeatures: document.getElementById('mNavFeatures'),
+  mNavPricing: document.getElementById('mNavPricing'),
+  mNavAccountants: document.getElementById('mNavAccountants'),
+  mNavSecurity: document.getElementById('mNavSecurity'),
+  mNavResources: document.getElementById('mNavResources'),
+  mPlans: document.getElementById('mPlans'),
+  mAccount: document.getElementById('mAccount'),
+  mSignOut: document.getElementById('mSignOut'),
+  mSignIn: document.getElementById('mSignIn'),
+  mGetKivana: document.getElementById('mGetKivana'),
   navFeatures: document.getElementById('navFeatures'),
   navPricing: document.getElementById('navPricing'),
   navAccountants: document.getElementById('navAccountants'),
@@ -16,6 +34,9 @@ const els = {
   osToggle: document.getElementById('osToggle'),
   osMac: document.getElementById('osMac'),
   osWin: document.getElementById('osWin'),
+  mOsToggle: document.getElementById('mOsToggle'),
+  mOsMac: document.getElementById('mOsMac'),
+  mOsWin: document.getElementById('mOsWin'),
   marketingSections: document.getElementById('marketingSections'),
   marketingFooter: document.getElementById('marketingFooter'),
   btnDownloadPrimary: document.getElementById('btnDownloadPrimary'),
@@ -205,6 +226,19 @@ function showOnly(view) {
   applyNav()
 }
 
+function openMenu() {
+  if (!els.mobileMenu) return
+  els.mobileMenu.classList.remove('hidden')
+  if (els.btnMenu) els.btnMenu.setAttribute('aria-expanded', 'true')
+  applyNav()
+}
+
+function closeMenu() {
+  if (!els.mobileMenu) return
+  els.mobileMenu.classList.add('hidden')
+  if (els.btnMenu) els.btnMenu.setAttribute('aria-expanded', 'false')
+}
+
 function applyNav() {
   const authed = isAuthed()
   if (els.btnSignIn) els.btnSignIn.classList.toggle('hidden', authed)
@@ -221,6 +255,11 @@ function applyNav() {
   els.btnSignOut.classList.toggle('hidden', !authed)
   els.btnNavPlans.classList.toggle('hidden', !authed)
   els.btnNavAccount.classList.toggle('hidden', !authed)
+
+  if (els.mobileMenuPublic) els.mobileMenuPublic.classList.toggle('hidden', authed)
+  if (els.mobileMenuPublicActions) els.mobileMenuPublicActions.classList.toggle('hidden', authed)
+  if (els.mobileMenuAuthed) els.mobileMenuAuthed.classList.toggle('hidden', !authed)
+  if (els.mobileMenuAuthedActions) els.mobileMenuAuthedActions.classList.toggle('hidden', !authed)
 }
 
 function toggleAuthMode(e) {
@@ -584,6 +623,7 @@ async function goToPublicSection(id) {
   await showDashboard()
   if (window.location.hash !== `#${id}`) window.location.hash = id
   setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0)
+  closeMenu()
 }
 
 if (els.navFeatures) els.navFeatures.addEventListener('click', () => void goToPublicSection('features'))
@@ -605,11 +645,47 @@ if (els.btnBackToWebsite) els.btnBackToWebsite.addEventListener('click', () => {
   void showDashboard()
 })
 
+if (els.btnMenu) els.btnMenu.addEventListener('click', () => {
+  if (!els.mobileMenu) return
+  const open = !els.mobileMenu.classList.contains('hidden')
+  if (open) closeMenu()
+  else openMenu()
+})
+if (els.btnCloseMenu) els.btnCloseMenu.addEventListener('click', closeMenu)
+if (els.menuBackdrop) els.menuBackdrop.addEventListener('click', closeMenu)
+
+if (els.mNavFeatures) els.mNavFeatures.addEventListener('click', () => void goToPublicSection('features'))
+if (els.mNavPricing) els.mNavPricing.addEventListener('click', () => void goToPublicSection('pricing'))
+if (els.mNavAccountants) els.mNavAccountants.addEventListener('click', () => void goToPublicSection('accountants'))
+if (els.mNavSecurity) els.mNavSecurity.addEventListener('click', () => void goToPublicSection('security'))
+if (els.mNavResources) els.mNavResources.addEventListener('click', () => void goToPublicSection('resources'))
+if (els.mSignIn) els.mSignIn.addEventListener('click', () => {
+  pendingPlanSelection = null
+  setAuthMode(true)
+  closeMenu()
+  void showAuth()
+})
+if (els.mGetKivana) els.mGetKivana.addEventListener('click', () => void goToPublicSection('pricing'))
+if (els.mPlans) els.mPlans.addEventListener('click', () => {
+  closeMenu()
+  void showDashboard()
+})
+if (els.mAccount) els.mAccount.addEventListener('click', () => {
+  closeMenu()
+  void showAccount()
+})
+if (els.mSignOut) els.mSignOut.addEventListener('click', () => {
+  closeMenu()
+  void handleSignOut()
+})
+
 let selectedOs = 'mac'
 function setSelectedOs(os) {
   selectedOs = os === 'win' ? 'win' : 'mac'
   if (els.osMac) els.osMac.classList.toggle('active', selectedOs === 'mac')
   if (els.osWin) els.osWin.classList.toggle('active', selectedOs === 'win')
+  if (els.mOsMac) els.mOsMac.classList.toggle('active', selectedOs === 'mac')
+  if (els.mOsWin) els.mOsWin.classList.toggle('active', selectedOs === 'win')
   if (els.btnDownloadPrimary) els.btnDownloadPrimary.textContent = selectedOs === 'mac' ? 'Download for macOS' : 'Download for Windows'
   if (els.btnDownloadSecondary) els.btnDownloadSecondary.textContent = selectedOs === 'mac' ? 'Download for Windows' : 'Download for macOS'
 }
@@ -629,6 +705,8 @@ async function handleDownloadClick() {
 
 if (els.osMac) els.osMac.addEventListener('click', () => setSelectedOs('mac'))
 if (els.osWin) els.osWin.addEventListener('click', () => setSelectedOs('win'))
+if (els.mOsMac) els.mOsMac.addEventListener('click', () => setSelectedOs('mac'))
+if (els.mOsWin) els.mOsWin.addEventListener('click', () => setSelectedOs('win'))
 if (els.btnDownloadPrimary) els.btnDownloadPrimary.addEventListener('click', () => void handleDownloadClick())
 if (els.btnDownloadSecondary) els.btnDownloadSecondary.addEventListener('click', () => void handleDownloadClick())
 
