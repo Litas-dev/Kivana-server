@@ -45,8 +45,7 @@ const els = {
   btnHeroViewPlans: document.getElementById('btnHeroViewPlans'),
   btnCtaCreate: document.getElementById('btnCtaCreate'),
   btnCtaSignIn: document.getElementById('btnCtaSignIn'),
-  btnCtaDownloadMac: document.getElementById('btnCtaDownloadMac'),
-  btnCtaDownloadWin: document.getElementById('btnCtaDownloadWin'),
+  btnCtaDownload: document.getElementById('btnCtaDownload'),
   btnAccountantService: document.getElementById('btnAccountantService'),
   btnBackToWebsite: document.getElementById('btnBackToWebsite'),
   footerYear: document.getElementById('footerYear'),
@@ -364,7 +363,7 @@ function resetPlanButtonLabels() {
   const btnStd = document.getElementById('btnPlanStandard')
   const btnPro = document.getElementById('btnPlanPro')
   const btnLifetime = document.getElementById('btnPlanLifetime')
-  if (btnBasic) btnBasic.textContent = 'Get Basic'
+  if (btnBasic) btnBasic.textContent = 'Start Free'
   if (btnLifetime) btnLifetime.textContent = 'Get Lifetime'
   updatePricingUI()
   if (btnStd && btnStd.textContent === 'Current plan') btnStd.textContent = billingCycle === 'yearly' ? 'Get Ordinary (Yearly)' : 'Get Ordinary (Monthly)'
@@ -674,9 +673,9 @@ function startFree() {
 
 if (els.navFeatures) els.navFeatures.addEventListener('click', () => void goToPublicSection('how'))
 if (els.navPricing) els.navPricing.addEventListener('click', () => void goToPublicSection('pricing'))
-if (els.navAccountants) els.navAccountants.addEventListener('click', () => void goToPublicSection('accountants'))
-if (els.navSecurity) els.navSecurity.addEventListener('click', () => void goToPublicSection('security'))
-if (els.navResources) els.navResources.addEventListener('click', () => void goToPublicSection('resources'))
+if (els.navSecurity) els.navSecurity.addEventListener('click', () => void goToPublicSection('benefits'))
+if (els.navResources) els.navResources.addEventListener('click', () => void goToPublicSection('preview'))
+if (els.navAccountants) els.navAccountants.addEventListener('click', () => void goToPublicSection('different'))
 if (els.btnCtaCreate) els.btnCtaCreate.addEventListener('click', startFree)
 if (els.btnCtaSignIn) els.btnCtaSignIn.addEventListener('click', () => {
   pendingPlanSelection = null
@@ -699,9 +698,9 @@ if (els.menuBackdrop) els.menuBackdrop.addEventListener('click', closeMenu)
 
 if (els.mNavFeatures) els.mNavFeatures.addEventListener('click', () => void goToPublicSection('how'))
 if (els.mNavPricing) els.mNavPricing.addEventListener('click', () => void goToPublicSection('pricing'))
-if (els.mNavAccountants) els.mNavAccountants.addEventListener('click', () => void goToPublicSection('accountants'))
-if (els.mNavSecurity) els.mNavSecurity.addEventListener('click', () => void goToPublicSection('security'))
-if (els.mNavResources) els.mNavResources.addEventListener('click', () => void goToPublicSection('resources'))
+if (els.mNavSecurity) els.mNavSecurity.addEventListener('click', () => void goToPublicSection('benefits'))
+if (els.mNavResources) els.mNavResources.addEventListener('click', () => void goToPublicSection('preview'))
+if (els.mNavAccountants) els.mNavAccountants.addEventListener('click', () => void goToPublicSection('different'))
 if (els.mSignIn) els.mSignIn.addEventListener('click', () => {
   pendingPlanSelection = null
   setAuthMode(true)
@@ -724,16 +723,15 @@ if (els.mSignOut) els.mSignOut.addEventListener('click', () => {
 
 if (els.btnHeroStartFree) els.btnHeroStartFree.addEventListener('click', startFree)
 if (els.btnHeroViewPlans) els.btnHeroViewPlans.addEventListener('click', () => void goToPublicSection('pricing'))
-if (els.btnAccountantService) els.btnAccountantService.addEventListener('click', () => void goToPublicSection('accountants'))
-
-if (els.btnCtaDownloadMac) els.btnCtaDownloadMac.addEventListener('click', () => {
-  setSelectedOs('mac')
-  void handleDownloadClick()
-})
-if (els.btnCtaDownloadWin) els.btnCtaDownloadWin.addEventListener('click', () => {
-  setSelectedOs('win')
-  void handleDownloadClick()
-})
+if (els.btnAccountantService) els.btnAccountantService.addEventListener('click', startFree)
+if (els.btnCtaDownload) {
+  els.btnCtaDownload.addEventListener('click', () => {
+    const ua = String(navigator.userAgent || '')
+    const isWin = /\bWindows\b/i.test(ua) || /\bWin64\b/i.test(ua) || /\bWin32\b/i.test(ua)
+    setSelectedOs(isWin ? 'win' : 'mac')
+    void handleDownloadClick()
+  })
+}
 
 let selectedOs = 'mac'
 function setSelectedOs(os) {
@@ -770,8 +768,12 @@ async function applyHashNav() {
   if (isAuthed()) return
   const id = String(window.location.hash || '').replace(/^#/, '').trim()
   if (!id) return
-  const normalized = id === 'features' ? 'how' : id
-  const allow = new Set(['how', 'pricing', 'accountants', 'security', 'resources'])
+  const normalized = id === 'features' ? 'how'
+    : id === 'security' ? 'benefits'
+    : id === 'resources' ? 'preview'
+    : id === 'accountants' ? 'different'
+    : id
+  const allow = new Set(['benefits', 'how', 'preview', 'different', 'pricing'])
   if (!allow.has(normalized)) return
   await showDashboard()
   setTimeout(() => document.getElementById(normalized)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0)

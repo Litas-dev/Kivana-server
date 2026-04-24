@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Kivana — Personal Finance & Accounting</title>
   <meta name="description" content="Kivana is local-first personal finance and accounting software. Your data stays on your device, with flexible plans and accountant-ready exports when you need them." />
-  <link rel="stylesheet" href="portal.css?v=0.4.6" />
+  <link rel="stylesheet" href="portal.css?v=0.4.7" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -18,9 +18,9 @@
         <div class="nav-main">
           <button class="nav-anchor" id="navFeatures">How it works</button>
           <button class="nav-anchor" id="navPricing">Pricing</button>
-          <button class="nav-anchor" id="navAccountants">For Accountants</button>
-          <button class="nav-anchor" id="navSecurity">Trust</button>
-          <button class="nav-anchor" id="navResources">Resources</button>
+          <button class="nav-anchor" id="navSecurity">Benefits</button>
+          <button class="nav-anchor" id="navResources">Preview</button>
+          <button class="nav-anchor" id="navAccountants">Why Kivana</button>
         </div>
         <div class="nav-actions">
           <div class="os-toggle" id="osToggle">
@@ -47,9 +47,9 @@
         <div class="mobile-menu-links" id="mobileMenuPublic">
           <button class="mobile-menu-link" id="mNavFeatures">How it works</button>
           <button class="mobile-menu-link" id="mNavPricing">Pricing</button>
-          <button class="mobile-menu-link" id="mNavAccountants">For Accountants</button>
-          <button class="mobile-menu-link" id="mNavSecurity">Trust</button>
-          <button class="mobile-menu-link" id="mNavResources">Resources</button>
+          <button class="mobile-menu-link" id="mNavSecurity">Benefits</button>
+          <button class="mobile-menu-link" id="mNavResources">Preview</button>
+          <button class="mobile-menu-link" id="mNavAccountants">Why Kivana</button>
         </div>
         <div class="mobile-menu-links hidden" id="mobileMenuAuthed">
           <button class="mobile-menu-link" id="mPlans">Plans</button>
@@ -103,11 +103,10 @@
     <div id="viewDashboard" class="view active">
       <div class="dashboard-header">
         <div id="marketingSections">
-          <div class="hero">
+          <div class="hero hero-solo">
             <div>
-              <div class="hero-kicker">Local-first desktop software</div>
               <h2 class="hero-title">Your finances.<br/>On your device.</h2>
-              <p class="hero-subtitle">Local-first accounting with flexible plans and on-demand accountants. Save time, save money, reduce stress.</p>
+              <p class="hero-subtitle">Simple accounting and personal finance with flexible plans and on-demand accountants.</p>
               <div class="hero-ctas">
                 <button class="btn btn-primary btn-hero" id="btnHeroStartFree">Start Free</button>
                 <button class="btn btn-secondary btn-hero" id="btnHeroViewPlans">View Plans</button>
@@ -118,15 +117,26 @@
                 <li>Hire an accountant in one click</li>
               </ul>
             </div>
-            <div class="hero-media">
-              <img
-                class="hero-image"
-                alt="Kivana app preview"
-                loading="lazy"
-                src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1800&q=80"
-              />
-            </div>
           </div>
+
+          <section class="section" id="benefits">
+            <div class="section-title">3 core benefits</div>
+            <div class="section-subtitle">Everything else supports these. Nothing else competes with them.</div>
+            <div class="benefits-grid">
+              <div class="benefit-card">
+                <div class="benefit-title">Full control</div>
+                <div class="benefit-desc">Your data stays on your device.</div>
+              </div>
+              <div class="benefit-card">
+                <div class="benefit-title">Flexible pricing</div>
+                <div class="benefit-desc">Upgrade only when you need more.</div>
+              </div>
+              <div class="benefit-card">
+                <div class="benefit-title">Professional help</div>
+                <div class="benefit-desc">Hire an accountant in one click.</div>
+              </div>
+            </div>
+          </section>
 
           <section class="section" id="how">
             <div class="section-title">How it works</div>
@@ -156,6 +166,39 @@
             </div>
           </section>
 
+          <section class="section" id="preview">
+            <div class="section-title">Product preview</div>
+            <div class="section-subtitle">Simple UI. Everything in one place.</div>
+            <div class="preview-media" aria-label="Kivana UI preview">
+              <svg class="preview-svg" viewBox="0 0 1200 680" role="img" aria-label="Kivana UI preview">
+                <defs>
+                  <linearGradient id="pvG" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="#0b1322"/>
+                    <stop offset="1" stop-color="#111827"/>
+                  </linearGradient>
+                </defs>
+                <rect x="0" y="0" width="1200" height="680" rx="22" fill="url(#pvG)"/>
+                <rect x="42" y="46" width="1116" height="74" rx="14" fill="rgba(255,255,255,0.06)"/>
+                <circle cx="78" cy="83" r="9" fill="rgba(255,255,255,0.22)"/>
+                <circle cx="108" cy="83" r="9" fill="rgba(255,255,255,0.18)"/>
+                <circle cx="138" cy="83" r="9" fill="rgba(255,255,255,0.14)"/>
+                <rect x="70" y="150" width="330" height="470" rx="16" fill="rgba(255,255,255,0.06)"/>
+                <rect x="428" y="150" width="730" height="240" rx="16" fill="rgba(163,230,53,0.10)"/>
+                <rect x="428" y="418" width="350" height="202" rx="16" fill="rgba(255,255,255,0.06)"/>
+                <rect x="808" y="418" width="350" height="202" rx="16" fill="rgba(255,255,255,0.06)"/>
+                <rect x="96" y="188" width="250" height="16" rx="8" fill="rgba(255,255,255,0.18)"/>
+                <rect x="96" y="220" width="210" height="12" rx="6" fill="rgba(255,255,255,0.12)"/>
+                <rect x="96" y="258" width="260" height="12" rx="6" fill="rgba(255,255,255,0.10)"/>
+                <rect x="96" y="286" width="220" height="12" rx="6" fill="rgba(255,255,255,0.10)"/>
+                <rect x="96" y="314" width="240" height="12" rx="6" fill="rgba(255,255,255,0.10)"/>
+                <rect x="468" y="190" width="320" height="22" rx="11" fill="rgba(255,255,255,0.22)"/>
+                <rect x="468" y="230" width="460" height="12" rx="6" fill="rgba(255,255,255,0.14)"/>
+                <rect x="468" y="254" width="420" height="12" rx="6" fill="rgba(255,255,255,0.12)"/>
+                <rect x="468" y="278" width="380" height="12" rx="6" fill="rgba(255,255,255,0.12)"/>
+              </svg>
+            </div>
+          </section>
+
           <section class="section" id="different">
             <div class="section-title">Why Kivana is different</div>
             <div class="section-subtitle">This is the edge: privacy-first control with optional services.</div>
@@ -165,35 +208,16 @@
                 <div class="diff-desc">Your data stays on your device.</div>
               </div>
               <div class="diff-card">
-                <div class="diff-title">Optional cloud</div>
-                <div class="diff-desc">Only if you choose it.</div>
+                <div class="diff-title">No forced cloud</div>
+                <div class="diff-desc">No account dependency to use the product.</div>
               </div>
               <div class="diff-card">
                 <div class="diff-title">No lock-in</div>
                 <div class="diff-desc">Flexible plans you control.</div>
               </div>
               <div class="diff-card">
-                <div class="diff-title">Accountant on demand</div>
-                <div class="diff-desc">Pay only when you need help.</div>
-              </div>
-            </div>
-          </section>
-
-          <section class="section" id="security">
-            <div class="section-title">Trust signals</div>
-            <div class="section-subtitle">Built for individuals and small businesses. Designed for privacy-first users.</div>
-            <div class="security-grid">
-              <div class="security-item">
-                <div class="security-t">Local-first by design</div>
-                <div class="security-d">Works offline and keeps data on your device.</div>
-              </div>
-              <div class="security-item">
-                <div class="security-t">Privacy-first</div>
-                <div class="security-d">No ads, no tracking, and no selling your data.</div>
-              </div>
-              <div class="security-item">
-                <div class="security-t">Early access</div>
-                <div class="security-d">Alpha testing is ongoing. New features ship regularly.</div>
+                <div class="diff-title">Pay only for what you use</div>
+                <div class="diff-desc">Start free and upgrade anytime.</div>
               </div>
             </div>
           </section>
@@ -201,7 +225,7 @@
 
         <section class="section" id="pricing">
           <div class="section-title">Pricing</div>
-          <div class="section-subtitle">Start free. Upgrade only when you need more.</div>
+          <div class="section-subtitle">Start free. Upgrade anytime.</div>
           <div class="pricing-points">
             <span class="pricing-point">Start free</span>
             <span class="pricing-point">Upgrade only when needed</span>
@@ -217,38 +241,34 @@
       <div class="plans-grid">
         <div class="plan-card">
           <div class="plan-header">
-            <h3>Basic</h3>
+            <h3>Free</h3>
             <div class="plan-for">Try it</div>
             <div class="price">€0</div>
-            <p class="plan-desc">Simple personal finance and organization.</p>
+            <p class="plan-desc">Personal finance and simple accounting.</p>
           </div>
           <ul class="features">
-            <li>Basic bill handling</li>
-            <li>Store invoices + bank statements</li>
-            <li>Export a clean package for your accountant</li>
-            <li>Local storage</li>
+            <li>Track income and expenses</li>
+            <li>Store invoices and statements</li>
+            <li>Export an accountant-ready pack</li>
           </ul>
-          <button class="btn btn-plan w-full" data-plan="basic" id="btnPlanBasic">Get Basic</button>
+          <button class="btn btn-plan w-full" data-plan="basic" id="btnPlanBasic">Start Free</button>
         </div>
 
         <div class="plan-card">
           <div class="plan-header">
             <h3>Ordinary</h3>
-            <div class="plan-for">Personal use</div>
+            <div class="plan-for">Personal</div>
             <div class="price">
               <span class="priceMain" id="stdMainPrice">€165</span><span class="priceUnit" id="stdMainUnit">/yr</span>
             </div>
             <div class="subPrice" id="stdSubPrice">€15/mo</div>
             <p class="plan-note" id="stdNote">Save 1 month with annual billing. €165 / year (1 month free).</p>
-            <p class="plan-desc">More control, better reports, and backup tools.</p>
+            <p class="plan-desc">More control when your workflow grows.</p>
           </div>
           <ul class="features">
-            <li>Everything in Basic</li>
-            <li>Advanced filters + sorting</li>
-            <li>Goals + debts</li>
-            <li>Backup + restore bundle</li>
-            <li>Expanded reporting tools</li>
-            <li>AI assistant (basic)</li>
+            <li>Everything in Free</li>
+            <li>Better reports and backup tools</li>
+            <li>Upgrade any time</li>
           </ul>
           <button class="btn btn-primary w-full" data-plan="standard" id="btnPlanStandard">Get Ordinary (Yearly)</button>
         </div>
@@ -263,49 +283,29 @@
             </div>
             <div class="subPrice" id="proSubPrice">€49/mo</div>
             <p class="plan-note" id="proNote">Save 1 month with annual billing. €539 / year (1 month free).</p>
-            <p class="plan-desc">For accountants and advanced tax workflows.</p>
+            <p class="plan-desc">Best for power users and advanced workflows.</p>
           </div>
           <ul class="features">
-            <li>Everything in Standard</li>
-            <li>Invoice attachments workflow</li>
-            <li>AI-assisted categorization + summaries</li>
-            <li>Client-ready export packs and reporting</li>
-            <li>Tax-year reporting support</li>
+            <li>Everything in Ordinary</li>
+            <li>Advanced workflows and exports</li>
             <li>Priority support</li>
           </ul>
           <button class="btn btn-primary w-full" data-plan="pro" id="btnPlanPro">Get Pro (Yearly)</button>
         </div>
 
-        <div class="plan-card">
-          <div class="plan-header">
-            <h3>Lifetime (Pro)</h3>
-            <div class="plan-for">For firms that prefer one-time purchase</div>
-            <div class="price">
-              <span class="priceMain">€1,599</span><span class="priceUnit">one-time</span>
-            </div>
-            <p class="plan-desc">For firms that prefer a one-time purchase instead of subscription billing.</p>
-          </div>
-          <ul class="features">
-            <li>Everything in Pro</li>
-            <li>Pay once</li>
-            <li>Lifetime access</li>
-          </ul>
-          <button class="btn btn-plan w-full" data-plan="lifetime_pro" id="btnPlanLifetime">Get Lifetime</button>
-        </div>
-
         <div class="plan-card plan-card-service">
           <div class="plan-header">
             <h3>Accountant</h3>
-            <div class="plan-for">Professional use</div>
+            <div class="plan-for">Professional</div>
             <div class="price">On demand</div>
-            <p class="plan-desc">Get a professional review when needed.</p>
+            <p class="plan-desc">Professional help when you need it.</p>
           </div>
           <ul class="features">
-            <li>Accountant-ready export pack</li>
-            <li>Optional professional support</li>
+            <li>Export pack + review</li>
+            <li>Fast support when needed</li>
             <li>No subscription required</li>
           </ul>
-          <button class="btn btn-secondary w-full" id="btnAccountantService">See how it works</button>
+          <button class="btn btn-secondary w-full" id="btnAccountantService">Start Free</button>
         </div>
       </div>
 
@@ -315,75 +315,13 @@
       <div id="dashboardStatus" class="status-msg"></div>
 
       <div id="marketingFooter">
-        <section class="section" id="accountants">
-          <div class="section-title">For accountants (tap to read more)</div>
-          <div class="section-subtitle">Simple for individuals. Detailed tools when a professional needs them.</div>
-          <div class="details-grid">
-            <details class="details-card">
-              <summary>Client-ready export packs</summary>
-              <div class="details-body">Generate a clean export pack that’s easy to share, archive, and review for tax-year reporting.</div>
-            </details>
-            <details class="details-card">
-              <summary>Fewer questions, faster reviews</summary>
-              <div class="details-body">Invoices, statements, and reports stay in one place, so review time goes down and context is preserved.</div>
-            </details>
-            <details class="details-card">
-              <summary>Reporting that matches real workflows</summary>
-              <div class="details-body">Filters and reporting help you reconcile quickly and catch issues earlier.</div>
-            </details>
-          </div>
-        </section>
-
-        <section class="section" id="resources">
-          <div class="section-title">Resources</div>
-          <div class="section-subtitle">Downloads and guides are coming soon.</div>
-          <div class="resource-grid">
-            <div class="resource-card">
-              <div class="resource-t">Downloads</div>
-              <div class="resource-d">macOS and Windows installers will be available soon.</div>
-            </div>
-            <div class="resource-card">
-              <div class="resource-t">Help center</div>
-              <div class="resource-d">Simple guides for organizing, exporting, and staying on top of finances.</div>
-            </div>
-            <div class="resource-card">
-              <div class="resource-t">Changelog</div>
-              <div class="resource-d">New features and improvements as Kivana evolves.</div>
-            </div>
-          </div>
-        </section>
-
-        <section class="section" id="faq">
-          <div class="section-title">FAQ</div>
-          <div class="section-subtitle">Quick answers to common questions.</div>
-          <div class="faq">
-            <div class="faq-item">
-              <div class="faq-q">Do I need a subscription to use Kivana? <span>+</span></div>
-              <div class="faq-a">You can start with Basic for free. Upgrade any time for advanced features.</div>
-            </div>
-            <div class="faq-item">
-              <div class="faq-q">Can I cancel whenever I want? <span>+</span></div>
-              <div class="faq-a">Yes. You can switch back to Basic from the Account page.</div>
-            </div>
-            <div class="faq-item">
-              <div class="faq-q">What is Lifetime (Pro)? <span>+</span></div>
-              <div class="faq-a">A one-time purchase for Pro features, intended for firms that prefer no subscription billing.</div>
-            </div>
-            <div class="faq-item">
-              <div class="faq-q">How do upgrades work today? <span>+</span></div>
-              <div class="faq-a">For now, plan changes are applied instantly in the portal while the payment flow is being integrated.</div>
-            </div>
-          </div>
-        </section>
-
         <section class="section">
           <div class="cta">
           <div class="cta-title">Take control of your finances.</div>
-          <div class="cta-subtitle">Start free now. Downloads for macOS and Windows are coming soon.</div>
+          <div class="cta-subtitle">Start free now. Download when you’re ready.</div>
             <div class="cta-actions">
             <button class="btn btn-primary btn-hero" id="btnCtaCreate">Start Free</button>
-            <button class="btn btn-secondary" id="btnCtaDownloadMac">Download for macOS</button>
-            <button class="btn btn-secondary" id="btnCtaDownloadWin">Download for Windows</button>
+            <button class="btn btn-secondary" id="btnCtaDownload">Download</button>
             </div>
           </div>
         </section>
@@ -441,6 +379,6 @@
     </div>
   </div>
 
-  <script src="portal.js?v=0.4.6"></script>
+  <script src="portal.js?v=0.4.7"></script>
 </body>
 </html>

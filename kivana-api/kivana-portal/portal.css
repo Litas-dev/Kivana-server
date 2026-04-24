@@ -525,6 +525,10 @@ body {
   text-align: left;
 }
 
+.hero.hero-solo {
+  grid-template-columns: 1fr;
+}
+
 @media (max-width: 900px) {
   .hero {
     grid-template-columns: 1fr;
@@ -706,6 +710,49 @@ body {
   color: var(--text-muted);
   margin-bottom: 1.5rem;
   max-width: 62ch;
+}
+
+.benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+@media (max-width: 900px) {
+  .benefits-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.benefit-card {
+  background: rgba(11, 19, 34, 0.75);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.benefit-title {
+  font-weight: 900;
+  margin-bottom: 0.35rem;
+}
+
+.benefit-desc {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.preview-media {
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.10);
+  box-shadow: 0 22px 70px rgba(0,0,0,0.55);
+  background: #0b1322;
+}
+
+.preview-svg {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
 .diff-grid {
