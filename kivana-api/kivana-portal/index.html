@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Kivana — Personal Finance & Accounting</title>
   <meta name="description" content="Kivana helps you organize finances, store invoices and statements, and export accountant-ready reports. Manage your subscription and account in one place." />
-  <link rel="stylesheet" href="portal.css?v=0.3.0" />
+  <link rel="stylesheet" href="portal.css?v=0.4.0" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -15,12 +15,21 @@
     <div id="navbar">
       <div class="logo">Kivana</div>
       <div class="nav-links">
-        <button class="nav-anchor" id="navFeatures">Features</button>
-        <button class="nav-anchor" id="navPricing">Pricing</button>
-        <button class="nav-anchor" id="navFAQ">FAQ</button>
-        <span class="nav-spacer"></span>
-        <button id="btnSignIn" class="btn btn-secondary">Sign in</button>
-        <button id="btnSignUp" class="btn btn-primary">Create account</button>
+        <div class="nav-main">
+          <button class="nav-anchor" id="navFeatures">Features</button>
+          <button class="nav-anchor" id="navPricing">Pricing</button>
+          <button class="nav-anchor" id="navAccountants">For Accountants</button>
+          <button class="nav-anchor" id="navSecurity">Security</button>
+          <button class="nav-anchor" id="navResources">Resources</button>
+        </div>
+        <div class="nav-actions">
+          <div class="os-toggle" id="osToggle">
+            <button type="button" class="os-btn active" id="osMac">macOS</button>
+            <button type="button" class="os-btn" id="osWin">Windows</button>
+          </div>
+          <button id="btnSignIn" class="btn btn-secondary">Sign in</button>
+          <button id="btnSignUp" class="btn btn-primary">Get Kivana</button>
+        </div>
         <button id="btnNavPlans" class="btn btn-secondary hidden">Plans</button>
         <button id="btnNavAccount" class="btn btn-secondary hidden">Account</button>
         <span id="navUserEmail" class="hidden"></span>
@@ -63,46 +72,47 @@
         <div id="marketingSections">
           <div class="hero">
             <div>
-              <h2 class="hero-title">Personal Finance, simplified.</h2>
-              <p class="hero-subtitle">A modern, accountant-friendly system to track finances, store invoices and statements, and export clean reports.</p>
+              <div class="hero-kicker">Desktop software</div>
+              <h2 class="hero-title">Accounting & more.<br/>Built for you.<br/>Not for the cloud.</h2>
+              <p class="hero-subtitle">Powerful personal finance and accounting software for your computer. 100% local, 100% secure. Your data stays on your device.</p>
               <div class="hero-ctas">
-                <button class="btn btn-primary" id="btnHeroCreate">Create account</button>
-                <button class="btn btn-secondary" id="btnHeroSignIn">Sign in</button>
+                <button class="btn btn-primary" id="btnDownloadPrimary">Download for macOS</button>
+                <button class="btn btn-secondary" id="btnDownloadSecondary">Download for Windows</button>
               </div>
               <div class="hero-badges">
-                <span class="badge-chip">Invoices</span>
-                <span class="badge-chip">Statements</span>
-                <span class="badge-chip">Exports</span>
-                <span class="badge-chip">Subscription</span>
+                <span class="badge-chip">Works offline</span>
+                <span class="badge-chip">No cloud</span>
+                <span class="badge-chip">No tracking</span>
+                <span class="badge-chip">Secure & private</span>
               </div>
             </div>
             <div class="hero-media">
               <img
                 class="hero-image"
-                alt="Accounting workspace"
+                alt="Kivana app preview"
                 loading="lazy"
-                src="https://images.unsplash.com/photo-1554224155-1696413565d3?auto=format&fit=crop&w=1200&q=80"
+                src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1800&q=80"
               />
               <div class="hero-stats">
                 <div class="stat">
-                  <div class="stat-k">Fast exports</div>
-                  <div class="stat-v">Accountant-ready</div>
+                  <div class="stat-k">100% local</div>
+                  <div class="stat-v">Your data stays on device</div>
                 </div>
                 <div class="stat">
-                  <div class="stat-k">Documents</div>
-                  <div class="stat-v">Invoices + statements</div>
+                  <div class="stat-k">Everything in one place</div>
+                  <div class="stat-v">Budgets, invoices, reports</div>
                 </div>
                 <div class="stat">
-                  <div class="stat-k">Control</div>
-                  <div class="stat-v">Upgrade / cancel anytime</div>
+                  <div class="stat-k">Flexible plans</div>
+                  <div class="stat-v">Upgrade or cancel anytime</div>
                 </div>
               </div>
             </div>
           </div>
 
           <section class="section" id="features">
-            <div class="section-title">Built for real workflows</div>
-            <div class="section-subtitle">From personal budgets to accountant-ready exports.</div>
+            <div class="section-title">Everything in one place</div>
+            <div class="section-subtitle">Manage finances, budgets, invoices, expenses, and reports in one app.</div>
             <div class="feature-grid">
               <div class="feature">
                 <h4>Invoices + statements</h4>
@@ -131,29 +141,29 @@
             </div>
           </section>
 
-          <section class="section" id="how">
-            <div class="section-title">How it works</div>
-            <div class="section-subtitle">A clean flow from documents → reports → export.</div>
+          <section class="section" id="accountants">
+            <div class="section-title">For accountants</div>
+            <div class="section-subtitle">Make client work faster with consistent exports and clean reporting.</div>
             <div class="steps">
               <div class="step">
                 <div class="step-n">1</div>
                 <div class="step-b">
-                  <div class="step-t">Add your documents</div>
-                  <div class="step-d">Upload invoices and statements, keep everything organized by year and category.</div>
+                  <div class="step-t">Collect everything</div>
+                  <div class="step-d">Invoices, statements, and documents stay organized and easy to review.</div>
                 </div>
               </div>
               <div class="step">
                 <div class="step-n">2</div>
                 <div class="step-b">
-                  <div class="step-t">Track and review</div>
-                  <div class="step-d">Use reporting tools to spot trends, filter transactions, and stay on top of tax workflows.</div>
+                  <div class="step-t">Review and reconcile</div>
+                  <div class="step-d">Use filters and reporting tools to catch issues early and reduce back-and-forth.</div>
                 </div>
               </div>
               <div class="step">
                 <div class="step-n">3</div>
                 <div class="step-b">
-                  <div class="step-t">Export for your accountant</div>
-                  <div class="step-d">Generate an export pack that’s easy to share and easy to audit.</div>
+                  <div class="step-t">Export packs</div>
+                  <div class="step-d">Generate a client-ready export pack for tax-year reporting and archives.</div>
                 </div>
               </div>
             </div>
@@ -161,19 +171,38 @@
 
           <section class="section" id="security">
             <div class="section-title">Security & privacy</div>
-            <div class="section-subtitle">Designed to keep your account and data safe.</div>
+            <div class="section-subtitle">Local-first by design. Your data stays on your computer.</div>
             <div class="security-grid">
               <div class="security-item">
-                <div class="security-t">Token-based authentication</div>
-                <div class="security-d">Secure sessions with refresh tokens and scoped API access.</div>
+                <div class="security-t">No cloud required</div>
+                <div class="security-d">Your accounting data stays local and works offline.</div>
               </div>
               <div class="security-item">
-                <div class="security-t">Plan enforcement</div>
-                <div class="security-d">Entitlements are checked server-side so features match your plan.</div>
+                <div class="security-t">Account access</div>
+                <div class="security-d">Manage subscriptions and entitlements through a secure account portal.</div>
               </div>
               <div class="security-item">
-                <div class="security-t">Account controls</div>
-                <div class="security-d">Manage your subscription, profile, and access from one portal.</div>
+                <div class="security-t">Private by default</div>
+                <div class="security-d">No tracking, no ads, and no selling your data.</div>
+              </div>
+            </div>
+          </section>
+
+          <section class="section" id="resources">
+            <div class="section-title">Resources</div>
+            <div class="section-subtitle">Guides and downloads are coming soon.</div>
+            <div class="resource-grid">
+              <div class="resource-card">
+                <div class="resource-t">Downloads</div>
+                <div class="resource-d">macOS and Windows installers will be available soon.</div>
+              </div>
+              <div class="resource-card">
+                <div class="resource-t">Help center</div>
+                <div class="resource-d">Step-by-step guides and best practices for bookkeeping and exports.</div>
+              </div>
+              <div class="resource-card">
+                <div class="resource-t">Changelog</div>
+                <div class="resource-d">New features and improvements as Kivana evolves.</div>
               </div>
             </div>
           </section>
@@ -299,7 +328,7 @@
             <div class="cta-title">Ready to get organized?</div>
             <div class="cta-subtitle">Create an account, choose a plan, and manage everything from a single portal.</div>
             <div class="cta-actions">
-              <button class="btn btn-primary" id="btnCtaCreate">Create account</button>
+              <button class="btn btn-primary" id="btnCtaCreate">Get Kivana</button>
               <button class="btn btn-secondary" id="btnCtaSignIn">Sign in</button>
             </div>
           </div>
@@ -358,6 +387,6 @@
     </div>
   </div>
 
-  <script src="portal.js?v=0.3.0"></script>
+  <script src="portal.js?v=0.4.0"></script>
 </body>
 </html>

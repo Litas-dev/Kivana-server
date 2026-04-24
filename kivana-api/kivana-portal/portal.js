@@ -10,11 +10,16 @@ const els = {
   btnSignUp: document.getElementById('btnSignUp'),
   navFeatures: document.getElementById('navFeatures'),
   navPricing: document.getElementById('navPricing'),
-  navFAQ: document.getElementById('navFAQ'),
+  navAccountants: document.getElementById('navAccountants'),
+  navSecurity: document.getElementById('navSecurity'),
+  navResources: document.getElementById('navResources'),
+  osToggle: document.getElementById('osToggle'),
+  osMac: document.getElementById('osMac'),
+  osWin: document.getElementById('osWin'),
   marketingSections: document.getElementById('marketingSections'),
   marketingFooter: document.getElementById('marketingFooter'),
-  btnHeroCreate: document.getElementById('btnHeroCreate'),
-  btnHeroSignIn: document.getElementById('btnHeroSignIn'),
+  btnDownloadPrimary: document.getElementById('btnDownloadPrimary'),
+  btnDownloadSecondary: document.getElementById('btnDownloadSecondary'),
   btnCtaCreate: document.getElementById('btnCtaCreate'),
   btnCtaSignIn: document.getElementById('btnCtaSignIn'),
   btnBackToWebsite: document.getElementById('btnBackToWebsite'),
@@ -206,7 +211,10 @@ function applyNav() {
   if (els.btnSignUp) els.btnSignUp.classList.toggle('hidden', authed)
   if (els.navFeatures) els.navFeatures.classList.toggle('hidden', authed)
   if (els.navPricing) els.navPricing.classList.toggle('hidden', authed)
-  if (els.navFAQ) els.navFAQ.classList.toggle('hidden', authed)
+  if (els.navAccountants) els.navAccountants.classList.toggle('hidden', authed)
+  if (els.navSecurity) els.navSecurity.classList.toggle('hidden', authed)
+  if (els.navResources) els.navResources.classList.toggle('hidden', authed)
+  if (els.osToggle) els.osToggle.classList.toggle('hidden', authed)
   if (els.marketingSections) els.marketingSections.classList.toggle('hidden', authed)
   if (els.marketingFooter) els.marketingFooter.classList.toggle('hidden', authed)
   els.navUserEmail.classList.toggle('hidden', !authed)
@@ -568,21 +576,7 @@ if (els.btnSignIn) els.btnSignIn.addEventListener('click', () => {
   setAuthMode(true)
   void showAuth()
 })
-if (els.btnSignUp) els.btnSignUp.addEventListener('click', () => {
-  pendingPlanSelection = null
-  setAuthMode(false)
-  void showAuth()
-})
-if (els.btnHeroCreate) els.btnHeroCreate.addEventListener('click', () => {
-  pendingPlanSelection = null
-  setAuthMode(false)
-  void showAuth()
-})
-if (els.btnHeroSignIn) els.btnHeroSignIn.addEventListener('click', () => {
-  pendingPlanSelection = null
-  setAuthMode(true)
-  void showAuth()
-})
+if (els.btnSignUp) els.btnSignUp.addEventListener('click', () => void goToPublicSection('pricing'))
 
 async function goToPublicSection(id) {
   if (isAuthed()) return
@@ -594,11 +588,12 @@ async function goToPublicSection(id) {
 
 if (els.navFeatures) els.navFeatures.addEventListener('click', () => void goToPublicSection('features'))
 if (els.navPricing) els.navPricing.addEventListener('click', () => void goToPublicSection('pricing'))
-if (els.navFAQ) els.navFAQ.addEventListener('click', () => void goToPublicSection('faq'))
+if (els.navAccountants) els.navAccountants.addEventListener('click', () => void goToPublicSection('accountants'))
+if (els.navSecurity) els.navSecurity.addEventListener('click', () => void goToPublicSection('security'))
+if (els.navResources) els.navResources.addEventListener('click', () => void goToPublicSection('resources'))
 if (els.btnCtaCreate) els.btnCtaCreate.addEventListener('click', () => {
   pendingPlanSelection = null
-  setAuthMode(false)
-  void showAuth()
+  void goToPublicSection('pricing')
 })
 if (els.btnCtaSignIn) els.btnCtaSignIn.addEventListener('click', () => {
   pendingPlanSelection = null
@@ -610,11 +605,38 @@ if (els.btnBackToWebsite) els.btnBackToWebsite.addEventListener('click', () => {
   void showDashboard()
 })
 
+let selectedOs = 'mac'
+function setSelectedOs(os) {
+  selectedOs = os === 'win' ? 'win' : 'mac'
+  if (els.osMac) els.osMac.classList.toggle('active', selectedOs === 'mac')
+  if (els.osWin) els.osWin.classList.toggle('active', selectedOs === 'win')
+  if (els.btnDownloadPrimary) els.btnDownloadPrimary.textContent = selectedOs === 'mac' ? 'Download for macOS' : 'Download for Windows'
+  if (els.btnDownloadSecondary) els.btnDownloadSecondary.textContent = selectedOs === 'mac' ? 'Download for Windows' : 'Download for macOS'
+}
+
+function showMarketingStatus(message) {
+  els.dashboardStatus.textContent = message
+  setTimeout(() => {
+    if (els.dashboardStatus.textContent === message) els.dashboardStatus.textContent = ''
+  }, 3500)
+}
+
+async function handleDownloadClick() {
+  if (isAuthed()) return
+  await goToPublicSection('pricing')
+  showMarketingStatus('Downloads are coming soon. Create an account and choose a plan to get ready.')
+}
+
+if (els.osMac) els.osMac.addEventListener('click', () => setSelectedOs('mac'))
+if (els.osWin) els.osWin.addEventListener('click', () => setSelectedOs('win'))
+if (els.btnDownloadPrimary) els.btnDownloadPrimary.addEventListener('click', () => void handleDownloadClick())
+if (els.btnDownloadSecondary) els.btnDownloadSecondary.addEventListener('click', () => void handleDownloadClick())
+
 async function applyHashNav() {
   if (isAuthed()) return
   const id = String(window.location.hash || '').replace(/^#/, '').trim()
   if (!id) return
-  const allow = new Set(['features', 'pricing', 'faq', 'how', 'security'])
+  const allow = new Set(['features', 'pricing', 'accountants', 'security', 'resources'])
   if (!allow.has(id)) return
   await showDashboard()
   setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0)
@@ -656,6 +678,7 @@ if (els.avatarFile) {
 
 ;(async () => {
   setBillingCycle('yearly')
+  setSelectedOs('mac')
   applyNav()
   if (els.footerYear) els.footerYear.textContent = String(new Date().getFullYear())
   if (getAccessToken()) {
