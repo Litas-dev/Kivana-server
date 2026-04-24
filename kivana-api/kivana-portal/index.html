@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Kivana — Personal Finance & Accounting</title>
   <meta name="description" content="Kivana is local-first personal finance and accounting software. Your data stays on your device, with flexible plans and accountant-ready exports when you need them." />
-  <link rel="stylesheet" href="portal.css?v=0.4.5" />
+  <link rel="stylesheet" href="portal.css?v=0.4.6" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -107,14 +107,14 @@
             <div>
               <div class="hero-kicker">Local-first desktop software</div>
               <h2 class="hero-title">Your finances.<br/>On your device.</h2>
-              <p class="hero-subtitle">Local-first accounting with optional cloud and on-demand accountants. Track spending, keep invoices, and export accountant-ready packs — with no cloud required.</p>
+              <p class="hero-subtitle">Local-first accounting with flexible plans and on-demand accountants. Save time, save money, reduce stress.</p>
               <div class="hero-ctas">
                 <button class="btn btn-primary btn-hero" id="btnHeroStartFree">Start Free</button>
                 <button class="btn btn-secondary btn-hero" id="btnHeroViewPlans">View Plans</button>
               </div>
               <ul class="hero-bullets">
-                <li>No cloud required</li>
-                <li>Pay only for what you use</li>
+                <li>No forced cloud</li>
+                <li>Pay only for what you need</li>
                 <li>Hire an accountant in one click</li>
               </ul>
             </div>
@@ -130,27 +130,27 @@
 
           <section class="section" id="how">
             <div class="section-title">How it works</div>
-            <div class="section-subtitle">A simple flow. Start personal, go professional only when needed.</div>
+            <div class="section-subtitle">A simple flow. No friction.</div>
             <div class="steps">
               <div class="step">
                 <div class="step-n">1</div>
                 <div>
-                  <div class="step-t">Install and keep data local</div>
-                  <div class="step-d">Run Kivana on your device. No cloud required.</div>
+                  <div class="step-t">Track your finances</div>
+                  <div class="step-d">Keep everything organized on your device.</div>
                 </div>
               </div>
               <div class="step">
                 <div class="step-n">2</div>
                 <div>
-                  <div class="step-t">Track and organize</div>
-                  <div class="step-d">Store invoices, statements, and keep your finances clear.</div>
+                  <div class="step-t">Upgrade only when needed</div>
+                  <div class="step-d">Start free. Move up when your workflow grows.</div>
                 </div>
               </div>
               <div class="step">
                 <div class="step-n">3</div>
                 <div>
-                  <div class="step-t">Export or get help</div>
-                  <div class="step-d">Generate accountant-ready packs or hire an accountant when needed.</div>
+                  <div class="step-t">Hire an accountant if required</div>
+                  <div class="step-d">Export a clean pack or get a professional review.</div>
                 </div>
               </div>
             </div>
@@ -158,25 +158,23 @@
 
           <section class="section" id="different">
             <div class="section-title">Why Kivana is different</div>
-            <div class="section-subtitle">Local-first control with optional upgrades — not lock-in.</div>
-            <div class="compare-grid">
-              <div class="compare-card">
-                <div class="compare-kicker">Typical cloud tools</div>
-                <ul class="compare-list">
-                  <li>Data lives on someone else’s servers</li>
-                  <li>Recurring subscriptions as default</li>
-                  <li>Sync issues and account dependency</li>
-                  <li>Sharing feels risky or messy</li>
-                </ul>
+            <div class="section-subtitle">This is the edge: privacy-first control with optional services.</div>
+            <div class="diff-grid">
+              <div class="diff-card">
+                <div class="diff-title">Works locally</div>
+                <div class="diff-desc">Your data stays on your device.</div>
               </div>
-              <div class="compare-card compare-card-primary">
-                <div class="compare-kicker">Kivana</div>
-                <ul class="compare-list">
-                  <li>Your data stays on your device</li>
-                  <li>Start free, upgrade only when needed</li>
-                  <li>Works offline by design</li>
-                  <li>Accountant-ready export packs</li>
-                </ul>
+              <div class="diff-card">
+                <div class="diff-title">Optional cloud</div>
+                <div class="diff-desc">Only if you choose it.</div>
+              </div>
+              <div class="diff-card">
+                <div class="diff-title">No lock-in</div>
+                <div class="diff-desc">Flexible plans you control.</div>
+              </div>
+              <div class="diff-card">
+                <div class="diff-title">Accountant on demand</div>
+                <div class="diff-desc">Pay only when you need help.</div>
               </div>
             </div>
           </section>
@@ -294,6 +292,21 @@
           </ul>
           <button class="btn btn-plan w-full" data-plan="lifetime_pro" id="btnPlanLifetime">Get Lifetime</button>
         </div>
+
+        <div class="plan-card plan-card-service">
+          <div class="plan-header">
+            <h3>Accountant</h3>
+            <div class="plan-for">Professional use</div>
+            <div class="price">On demand</div>
+            <p class="plan-desc">Get a professional review when needed.</p>
+          </div>
+          <ul class="features">
+            <li>Accountant-ready export pack</li>
+            <li>Optional professional support</li>
+            <li>No subscription required</li>
+          </ul>
+          <button class="btn btn-secondary w-full" id="btnAccountantService">See how it works</button>
+        </div>
       </div>
 
       <div class="current-plan-banner hidden" id="currentPlanBanner">
@@ -365,11 +378,12 @@
 
         <section class="section">
           <div class="cta">
-            <div class="cta-title">Start free — no risk</div>
-            <div class="cta-subtitle">Upgrade only when you need more. Hire an accountant when you need help.</div>
+          <div class="cta-title">Take control of your finances.</div>
+          <div class="cta-subtitle">Start free now. Downloads for macOS and Windows are coming soon.</div>
             <div class="cta-actions">
-              <button class="btn btn-primary btn-hero" id="btnCtaCreate">Start Free</button>
-              <button class="btn btn-secondary" id="btnCtaSignIn">Sign in</button>
+            <button class="btn btn-primary btn-hero" id="btnCtaCreate">Start Free</button>
+            <button class="btn btn-secondary" id="btnCtaDownloadMac">Download for macOS</button>
+            <button class="btn btn-secondary" id="btnCtaDownloadWin">Download for Windows</button>
             </div>
           </div>
         </section>
@@ -427,6 +441,6 @@
     </div>
   </div>
 
-  <script src="portal.js?v=0.4.5"></script>
+  <script src="portal.js?v=0.4.6"></script>
 </body>
 </html>

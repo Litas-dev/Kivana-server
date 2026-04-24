@@ -708,6 +708,41 @@ body {
   max-width: 62ch;
 }
 
+.diff-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+@media (max-width: 1100px) {
+  .diff-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .diff-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.diff-card {
+  background: rgba(11, 19, 34, 0.75);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.diff-title {
+  font-weight: 900;
+  margin-bottom: 0.35rem;
+}
+
+.diff-desc {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
 @media (max-width: 600px) {
   .section {
     padding: 1.25rem;
@@ -1095,7 +1130,7 @@ body {
 
 .plans-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(220px, 1fr));
+  grid-template-columns: repeat(3, minmax(260px, 1fr));
   gap: 2rem;
   margin-bottom: 3rem;
 }
@@ -1131,6 +1166,10 @@ body {
   animation: fadeUp 0.45s ease both;
 }
 
+.plan-card:not(.highlight) {
+  opacity: 0.92;
+}
+
 .plan-card:nth-child(1) { animation-delay: 0.02s; }
 .plan-card:nth-child(2) { animation-delay: 0.06s; }
 .plan-card:nth-child(3) { animation-delay: 0.10s; }
@@ -1153,7 +1192,13 @@ body {
   border-color: var(--primary);
   box-shadow: 0 18px 60px rgba(163, 230, 53, 0.10);
   background: linear-gradient(180deg, rgba(163,230,53,0.10), rgba(11, 19, 34, 0.78) 42%);
-  transform: translateY(-6px);
+  transform: translateY(-10px) scale(1.015);
+}
+
+.plan-card-service {
+  background: rgba(11, 19, 34, 0.62);
+  border-style: dashed;
+  opacity: 0.95;
 }
 
 .plan-card.is-current {

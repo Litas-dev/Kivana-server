@@ -45,6 +45,9 @@ const els = {
   btnHeroViewPlans: document.getElementById('btnHeroViewPlans'),
   btnCtaCreate: document.getElementById('btnCtaCreate'),
   btnCtaSignIn: document.getElementById('btnCtaSignIn'),
+  btnCtaDownloadMac: document.getElementById('btnCtaDownloadMac'),
+  btnCtaDownloadWin: document.getElementById('btnCtaDownloadWin'),
+  btnAccountantService: document.getElementById('btnAccountantService'),
   btnBackToWebsite: document.getElementById('btnBackToWebsite'),
   footerYear: document.getElementById('footerYear'),
 
@@ -721,6 +724,16 @@ if (els.mSignOut) els.mSignOut.addEventListener('click', () => {
 
 if (els.btnHeroStartFree) els.btnHeroStartFree.addEventListener('click', startFree)
 if (els.btnHeroViewPlans) els.btnHeroViewPlans.addEventListener('click', () => void goToPublicSection('pricing'))
+if (els.btnAccountantService) els.btnAccountantService.addEventListener('click', () => void goToPublicSection('accountants'))
+
+if (els.btnCtaDownloadMac) els.btnCtaDownloadMac.addEventListener('click', () => {
+  setSelectedOs('mac')
+  void handleDownloadClick()
+})
+if (els.btnCtaDownloadWin) els.btnCtaDownloadWin.addEventListener('click', () => {
+  setSelectedOs('win')
+  void handleDownloadClick()
+})
 
 let selectedOs = 'mac'
 function setSelectedOs(os) {
