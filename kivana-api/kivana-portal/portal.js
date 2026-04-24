@@ -6,6 +6,8 @@ const els = {
   btnSignOut: document.getElementById('btnSignOut'),
   btnNavPlans: document.getElementById('btnNavPlans'),
   btnNavAccount: document.getElementById('btnNavAccount'),
+  btnSignIn: document.getElementById('btnSignIn'),
+  btnSignUp: document.getElementById('btnSignUp'),
 
   authForm: document.getElementById('authForm'),
   authTitle: document.getElementById('authTitle'),
@@ -50,6 +52,7 @@ let isLoginMode = true
 let billingCycle = 'yearly'
 let currentMe = null
 let currentEntitlement = null
+let pendingPlanSelection = null
 
 function getAccessToken() {
   return localStorage.getItem('kivanaPortal/accessToken') || ''
@@ -93,6 +96,10 @@ function computeApiBaseUrl() {
 
 const apiBaseUrl = computeApiBaseUrl()
 const apiUrl = (path) => `${apiBaseUrl}${path}`
+
+function isAuthed() {
+  return !!getAccessToken()
+}
 
 async function apiFetch(path, init = {}) {
   const access = getAccessToken()
@@ -179,8 +186,13 @@ function showOnly(view) {
   els.viewAuth.classList.toggle('hidden', view !== 'auth')
   els.viewDashboard.classList.toggle('hidden', view !== 'dashboard')
   els.viewAccount.classList.toggle('hidden', view !== 'account')
+  applyNav()
+}
 
-  const authed = view !== 'auth'
+function applyNav() {
+  const authed = isAuthed()
+  if (els.btnSignIn) els.btnSignIn.classList.toggle('hidden', authed)
+  if (els.btnSignUp) els.btnSignUp.classList.toggle('hidden', authed)
   els.navUserEmail.classList.toggle('hidden', !authed)
   els.btnSignOut.classList.toggle('hidden', !authed)
   els.btnNavPlans.classList.toggle('hidden', !authed)
@@ -231,6 +243,11 @@ async function handleAuthSubmit(e) {
     const json = await res.json()
     setTokens(json.accessToken, json.refreshToken)
     await showDashboard()
+    if (pendingPlanSelection) {
+      const payload = pendingPlanSelection
+      pendingPlanSelection = null
+      await handleSelectPlan(payload, els.dashboardStatus)
+    }
   } catch (err) {
     els.authError.textContent = err && err.message ? err.message : 'Failed to sign in.'
   } finally {
@@ -369,14 +386,28 @@ function fillAccountProfile() {
 async function showDashboard() {
   showOnly('dashboard')
   els.dashboardStatus.textContent = ''
-  try {
-    await syncSessionData()
-  } catch (err) {
-    console.error('Failed to load dashboard data:', err)
+  if (isAuthed()) {
+    try {
+      await syncSessionData()
+      return
+    } catch (err) {
+      console.error('Failed to load dashboard data:', err)
+      clearTokens()
+    }
   }
+  currentMe = null
+  currentEntitlement = null
+  els.currentPlanBanner.classList.add('hidden')
+  applyCurrentPlanUI()
 }
 
 async function showAccount() {
+  if (!isAuthed()) {
+    pendingPlanSelection = null
+    setAuthMode(true)
+    await showAuth()
+    return
+  }
   showOnly('account')
   els.accountStatus.textContent = ''
   els.profileStatus.textContent = ''
@@ -395,6 +426,12 @@ async function showAuth() {
 }
 
 async function handleSelectPlan(payload, statusEl) {
+  if (!isAuthed()) {
+    pendingPlanSelection = payload
+    setAuthMode(false)
+    await showAuth()
+    return
+  }
   const currentCode = currentEntitlement ? String(currentEntitlement.planCode || '').trim().toLowerCase() : 'basic'
   const nextCode = String(payload.planCode || '').trim().toLowerCase()
   if (!nextCode || nextCode === currentCode) return
@@ -486,11 +523,39 @@ async function handleCancelSubscription() {
   await handleSelectPlan({ planCode: 'basic' }, els.accountStatus)
 }
 
+function setAuthMode(loginMode) {
+  isLoginMode = !!loginMode
+  els.authError.textContent = ''
+  if (isLoginMode) {
+    els.authTitle.textContent = 'Sign in to Kivana'
+    els.authSubtitle.textContent = 'Manage your Personal Finance app subscription.'
+    els.btnSubmitAuth.textContent = 'Sign in'
+    els.authToggleText.textContent = "Don't have an account?"
+    els.linkToggleAuth.textContent = 'Create one'
+  } else {
+    els.authTitle.textContent = 'Create an account'
+    els.authSubtitle.textContent = 'Get started with your free Kivana account.'
+    els.btnSubmitAuth.textContent = 'Sign up'
+    els.authToggleText.textContent = 'Already have an account?'
+    els.linkToggleAuth.textContent = 'Sign in'
+  }
+}
+
 if (els.linkToggleAuth) els.linkToggleAuth.addEventListener('click', toggleAuthMode)
 if (els.authForm) els.authForm.addEventListener('submit', handleAuthSubmit)
 if (els.btnSignOut) els.btnSignOut.addEventListener('click', handleSignOut)
 if (els.btnNavPlans) els.btnNavPlans.addEventListener('click', () => void showDashboard())
 if (els.btnNavAccount) els.btnNavAccount.addEventListener('click', () => void showAccount())
+if (els.btnSignIn) els.btnSignIn.addEventListener('click', () => {
+  pendingPlanSelection = null
+  setAuthMode(true)
+  void showAuth()
+})
+if (els.btnSignUp) els.btnSignUp.addEventListener('click', () => {
+  pendingPlanSelection = null
+  setAuthMode(false)
+  void showAuth()
+})
 
 if (els.btnBillingYearly) els.btnBillingYearly.addEventListener('click', () => setBillingCycle('yearly'))
 if (els.btnBillingMonthly) els.btnBillingMonthly.addEventListener('click', () => setBillingCycle('monthly'))
@@ -519,6 +584,7 @@ if (els.avatarFile) {
 
 ;(async () => {
   setBillingCycle('yearly')
+  applyNav()
   if (getAccessToken()) {
     try {
       await refreshAccessToken()
@@ -528,5 +594,5 @@ if (els.avatarFile) {
       clearTokens()
     }
   }
-  await showAuth()
+  await showDashboard()
 })()
