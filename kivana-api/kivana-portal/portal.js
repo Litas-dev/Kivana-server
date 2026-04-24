@@ -41,6 +41,8 @@ const els = {
   marketingFooter: document.getElementById('marketingFooter'),
   btnDownloadPrimary: document.getElementById('btnDownloadPrimary'),
   btnDownloadSecondary: document.getElementById('btnDownloadSecondary'),
+  btnHeroStartFree: document.getElementById('btnHeroStartFree'),
+  btnHeroViewPlans: document.getElementById('btnHeroViewPlans'),
   btnCtaCreate: document.getElementById('btnCtaCreate'),
   btnCtaSignIn: document.getElementById('btnCtaSignIn'),
   btnBackToWebsite: document.getElementById('btnBackToWebsite'),
@@ -145,6 +147,20 @@ async function apiFetch(path, init = {}) {
   if (access) headers.set('authorization', `Bearer ${access}`)
   const res = await fetch(apiUrl(path), { ...init, headers })
   if (res.ok) return res
+
+  if (res.status === 401 && getRefreshToken()) {
+    try {
+      await refreshAccessToken()
+      const retryHeaders = new Headers(init.headers || {})
+      retryHeaders.set('content-type', 'application/json')
+      const nextAccess = getAccessToken()
+      if (nextAccess) retryHeaders.set('authorization', `Bearer ${nextAccess}`)
+      const retry = await fetch(apiUrl(path), { ...init, headers: retryHeaders })
+      if (retry.ok) return retry
+    } catch {
+      void 0
+    }
+  }
 
   let err = `HTTP ${res.status}`
   if (res.status === 501) {
@@ -529,22 +545,45 @@ async function handleAvatarFile(file) {
   els.profileStatus.textContent = ''
   setBusy(true)
   try {
-    const dataUrl = await new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onload = () => resolve(String(reader.result || ''))
-      reader.onerror = () => reject(new Error('Failed to read image'))
-      reader.readAsDataURL(file)
-    })
-    if (dataUrl.length > 200_000) {
-      throw new Error('Image too large. Please use a smaller image.')
+    const finalDataUrl = await (async () => {
+      const maxSize = 256
+      const objectUrl = URL.createObjectURL(file)
+      try {
+        const img = await new Promise((resolve, reject) => {
+          const i = new Image()
+          i.onload = () => resolve(i)
+          i.onerror = () => reject(new Error('Failed to decode image'))
+          i.src = objectUrl
+        })
+        const iw = img.naturalWidth || img.width || 0
+        const ih = img.naturalHeight || img.height || 0
+        if (!iw || !ih) throw new Error('Invalid image')
+
+        const scale = Math.min(1, maxSize / Math.max(iw, ih))
+        const w = Math.max(1, Math.round(iw * scale))
+        const h = Math.max(1, Math.round(ih * scale))
+
+        const canvas = document.createElement('canvas')
+        canvas.width = w
+        canvas.height = h
+        const ctx = canvas.getContext('2d')
+        if (!ctx) throw new Error('Failed to process image')
+        ctx.drawImage(img, 0, 0, w, h)
+
+        const asWebp = canvas.toDataURL('image/webp', 0.8)
+        if (asWebp && asWebp.startsWith('data:image/webp') && asWebp.length > 100) return asWebp
+        return canvas.toDataURL('image/jpeg', 0.82)
+      } finally {
+        URL.revokeObjectURL(objectUrl)
+      }
+    })()
+
+    if (finalDataUrl.length > 1_000_000) {
+      throw new Error('Image still too large after compression.')
     }
-    saveProfileLocal(currentMe.id, { avatarDataUrl: dataUrl })
-    try {
-      await updateProfileOnServer({ avatarDataUrl: dataUrl })
-      await syncSessionData()
-    } catch {
-      void 0
-    }
+    saveProfileLocal(currentMe.id, { avatarDataUrl: finalDataUrl })
+    await updateProfileOnServer({ avatarDataUrl: finalDataUrl })
+    await syncSessionData()
     fillAccountProfile()
     els.profileStatus.textContent = 'Avatar saved.'
   } catch (err) {
@@ -563,16 +602,12 @@ async function handleSaveProfile() {
   try {
     const displayName = String(els.displayName.value || '').trim()
     saveProfileLocal(currentMe.id, { displayName })
-    try {
-      await updateProfileOnServer({ displayName })
-      await syncSessionData()
-    } catch {
-      void 0
-    }
+    await updateProfileOnServer({ displayName })
+    await syncSessionData()
     fillAccountProfile()
     if (els.profileStatus) els.profileStatus.textContent = 'Profile saved.'
-  } catch {
-    if (els.profileStatus) els.profileStatus.textContent = 'Failed to save profile.'
+  } catch (err) {
+    if (els.profileStatus) els.profileStatus.textContent = err && err.message ? err.message : 'Failed to save profile.'
   } finally {
     setBusy(false)
     if (els.profileStatus) setTimeout(() => (els.profileStatus.textContent = ''), 2500)
@@ -615,7 +650,7 @@ if (els.btnSignIn) els.btnSignIn.addEventListener('click', () => {
   setAuthMode(true)
   void showAuth()
 })
-if (els.btnSignUp) els.btnSignUp.addEventListener('click', () => void goToPublicSection('pricing'))
+if (els.btnSignUp) els.btnSignUp.addEventListener('click', startFree)
 
 async function goToPublicSection(id) {
   if (isAuthed()) return
@@ -626,15 +661,20 @@ async function goToPublicSection(id) {
   closeMenu()
 }
 
+function startFree() {
+  if (isAuthed()) return
+  pendingPlanSelection = { planCode: 'basic' }
+  setAuthMode(false)
+  closeMenu()
+  void showAuth()
+}
+
 if (els.navFeatures) els.navFeatures.addEventListener('click', () => void goToPublicSection('features'))
 if (els.navPricing) els.navPricing.addEventListener('click', () => void goToPublicSection('pricing'))
 if (els.navAccountants) els.navAccountants.addEventListener('click', () => void goToPublicSection('accountants'))
 if (els.navSecurity) els.navSecurity.addEventListener('click', () => void goToPublicSection('security'))
 if (els.navResources) els.navResources.addEventListener('click', () => void goToPublicSection('resources'))
-if (els.btnCtaCreate) els.btnCtaCreate.addEventListener('click', () => {
-  pendingPlanSelection = null
-  void goToPublicSection('pricing')
-})
+if (els.btnCtaCreate) els.btnCtaCreate.addEventListener('click', startFree)
 if (els.btnCtaSignIn) els.btnCtaSignIn.addEventListener('click', () => {
   pendingPlanSelection = null
   setAuthMode(true)
@@ -665,7 +705,7 @@ if (els.mSignIn) els.mSignIn.addEventListener('click', () => {
   closeMenu()
   void showAuth()
 })
-if (els.mGetKivana) els.mGetKivana.addEventListener('click', () => void goToPublicSection('pricing'))
+if (els.mGetKivana) els.mGetKivana.addEventListener('click', startFree)
 if (els.mPlans) els.mPlans.addEventListener('click', () => {
   closeMenu()
   void showDashboard()
@@ -678,6 +718,9 @@ if (els.mSignOut) els.mSignOut.addEventListener('click', () => {
   closeMenu()
   void handleSignOut()
 })
+
+if (els.btnHeroStartFree) els.btnHeroStartFree.addEventListener('click', startFree)
+if (els.btnHeroViewPlans) els.btnHeroViewPlans.addEventListener('click', () => void goToPublicSection('pricing'))
 
 let selectedOs = 'mac'
 function setSelectedOs(os) {
