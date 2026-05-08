@@ -27,7 +27,11 @@ API_DIR_DEFAULT="${REPO_DIR_DEFAULT}/kivana-api"
 
 REPO_URL="$REPO_URL_DEFAULT"
 BASE_DIR="$BASE_DIR_DEFAULT"
-HTTP_PORT="80"
+HTTP_PORT="8080"
+KIVANA_BIND_IP="0.0.0.0"
+DOMAIN_NAME=""
+HTTPS_EMAIL=""
+ENABLE_HTTPS="n"
 POSTGRES_PASSWORD=""
 JWT_SECRET=""
 ADMIN_TOKEN=""
@@ -120,7 +124,22 @@ if [ -r /dev/tty ]; then
   info "Starting interactive setup..."
   REPO_URL="$(prompt "GitHub repo URL" "$REPO_URL_DEFAULT")"
   BASE_DIR="$(prompt "Install base dir" "$BASE_DIR_DEFAULT")"
-  HTTP_PORT="$(prompt "HTTP port" "80")"
+  HTTP_PORT="$(prompt "Internal API port" "8080")"
+  DOMAIN_NAME="$(prompt "Public domain name for HTTPS (example: kivana.eu). Leave blank to skip" "")"
+  if [ -n "$DOMAIN_NAME" ]; then
+    ENABLE_HTTPS="y"
+    if confirm "Enable HTTPS (Let's Encrypt) using Caddy?" y; then
+      ENABLE_HTTPS="y"
+      HTTPS_EMAIL="$(prompt "TLS email (optional, used for Let's Encrypt expiry notices)" "")"
+      KIVANA_BIND_IP="127.0.0.1"
+      if [ "$HTTP_PORT" = "80" ] || [ "$HTTP_PORT" = "443" ]; then
+        warn "Port ${HTTP_PORT} is reserved for HTTPS. Using internal API port 8080 instead."
+        HTTP_PORT="8080"
+      fi
+    else
+      ENABLE_HTTPS="n"
+    fi
+  fi
 
   POSTGRES_PASSWORD="$(prompt "Postgres password (leave blank to auto-generate)" "")"
   JWT_SECRET="$(prompt "JWT secret (leave blank to auto-generate)" "")"
@@ -202,10 +221,16 @@ if [ -f .env ]; then
     OVERWRITE_ENV="n"
     warn "Keeping existing .env"
     existing_http_port="$(grep -E '^KIVANA_HTTP_PORT=' .env | head -n1 | cut -d= -f2- || true)"
+    existing_bind_ip="$(grep -E '^KIVANA_BIND_IP=' .env | head -n1 | cut -d= -f2- || true)"
+    existing_domain_name="$(grep -E '^KIVANA_DOMAIN=' .env | head -n1 | cut -d= -f2- || true)"
+    existing_enable_https="$(grep -E '^KIVANA_ENABLE_HTTPS=' .env | head -n1 | cut -d= -f2- || true)"
     existing_postgres_password="$(grep -E '^POSTGRES_PASSWORD=' .env | head -n1 | cut -d= -f2- || true)"
     existing_jwt_secret="$(grep -E '^JWT_SECRET=' .env | head -n1 | cut -d= -f2- || true)"
     existing_admin_token="$(grep -E '^ADMIN_TOKEN=' .env | head -n1 | cut -d= -f2- || true)"
     if [ -n "$existing_http_port" ]; then HTTP_PORT="$existing_http_port"; fi
+    if [ -n "$existing_bind_ip" ]; then KIVANA_BIND_IP="$existing_bind_ip"; fi
+    if [ -n "$existing_domain_name" ]; then DOMAIN_NAME="$existing_domain_name"; fi
+    if [ -n "$existing_enable_https" ]; then ENABLE_HTTPS="$existing_enable_https"; fi
     if [ -n "$existing_postgres_password" ]; then POSTGRES_PASSWORD="$existing_postgres_password"; fi
     if [ -n "$existing_jwt_secret" ]; then JWT_SECRET="$existing_jwt_secret"; fi
     if [ -n "$existing_admin_token" ]; then ADMIN_TOKEN="$existing_admin_token"; fi
@@ -222,6 +247,9 @@ BIND_ADDR=0.0.0.0:8080
 ADMIN_TOKEN=${ADMIN_TOKEN}
 RUST_LOG=info
 KIVANA_HTTP_PORT=${HTTP_PORT}
+KIVANA_BIND_IP=${KIVANA_BIND_IP}
+KIVANA_DOMAIN=${DOMAIN_NAME}
+KIVANA_ENABLE_HTTPS=${ENABLE_HTTPS}
 POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
 EOF
   chmod 600 .env || true
@@ -279,6 +307,75 @@ if [ "$ok" != "y" ]; then
 fi
 success "Server is healthy!"
 
+setup_caddy_https() {
+  local domain="$1"
+  local upstream_port="$2"
+  local email="${3:-}"
+
+  if [ -z "$domain" ]; then
+    return 0
+  fi
+
+  if ! command -v systemctl >/dev/null 2>&1; then
+    warn "systemctl not found. Skipping HTTPS setup."
+    return 0
+  fi
+
+  if ! command -v caddy >/dev/null 2>&1; then
+    info "Installing Caddy (HTTPS reverse proxy)..."
+    apt-get update -y
+    apt-get install -y curl ca-certificates debian-keyring debian-archive-keyring apt-transport-https gnupg
+    curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+    curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list >/dev/null
+    apt-get update -y
+    apt-get install -y caddy
+    success "Caddy installed."
+  fi
+
+  mkdir -p /etc/caddy
+
+  if [ -f /etc/caddy/Caddyfile ]; then
+    local ts
+    ts="$(date +%Y%m%d-%H%M%S)"
+    cp /etc/caddy/Caddyfile "/etc/caddy/Caddyfile.backup-${ts}" || true
+  fi
+
+  info "Writing Caddyfile (HTTPS for ${domain})..."
+  if [ -n "$email" ]; then
+    cat > /etc/caddy/Caddyfile <<EOF
+{
+  email ${email}
+}
+
+${domain} {
+  encode zstd gzip
+  reverse_proxy 127.0.0.1:${upstream_port}
+}
+EOF
+  else
+    cat > /etc/caddy/Caddyfile <<EOF
+${domain} {
+  encode zstd gzip
+  reverse_proxy 127.0.0.1:${upstream_port}
+}
+EOF
+  fi
+
+  systemctl enable --now caddy >/dev/null 2>&1 || true
+  if systemctl reload caddy >/dev/null 2>&1; then
+    success "HTTPS enabled via Caddy."
+  else
+    systemctl restart caddy >/dev/null 2>&1 || true
+    success "Caddy restarted."
+  fi
+}
+
+if [ -n "$DOMAIN_NAME" ] && [ "$ENABLE_HTTPS" = "y" ]; then
+  echo
+  warn "HTTPS requires ports 80 and 443 reachable from the internet for Let's Encrypt."
+  setup_caddy_https "$DOMAIN_NAME" "$HTTP_PORT" "$HTTPS_EMAIL"
+fi
+
 PUBLIC_IP=""
 if command -v curl >/dev/null 2>&1; then
   PUBLIC_IP="$(curl -fsS https://api.ipify.org 2>/dev/null || true)"
@@ -298,9 +395,15 @@ fi
 echo -e "\n${C_GREEN}===============================================${C_RESET}"
 echo -e "${C_GREEN}✓ Setup Complete!${C_RESET}"
 echo -e "${C_GREEN}===============================================${C_RESET}"
-echo -e "${C_BOLD}Portal:${C_RESET} ${C_BLUE}http://${PUBLIC_IP}${PORT_SUFFIX}/portal/${C_RESET}"
-echo -e "${C_BOLD}Admin:${C_RESET}  ${C_BLUE}http://${PUBLIC_IP}${PORT_SUFFIX}/admin/${C_RESET}"
-echo -e "${C_BOLD}API:${C_RESET}    ${C_BLUE}http://${PUBLIC_IP}${PORT_SUFFIX}/healthz${C_RESET}"
+if [ -n "$DOMAIN_NAME" ] && [ "$ENABLE_HTTPS" = "y" ]; then
+  echo -e "${C_BOLD}Portal:${C_RESET} ${C_BLUE}https://${DOMAIN_NAME}/${C_RESET}"
+  echo -e "${C_BOLD}Admin:${C_RESET}  ${C_BLUE}https://${DOMAIN_NAME}/admin/${C_RESET}"
+  echo -e "${C_BOLD}API:${C_RESET}    ${C_BLUE}https://${DOMAIN_NAME}/healthz${C_RESET}"
+else
+  echo -e "${C_BOLD}Portal:${C_RESET} ${C_BLUE}http://${PUBLIC_IP}${PORT_SUFFIX}/${C_RESET}"
+  echo -e "${C_BOLD}Admin:${C_RESET}  ${C_BLUE}http://${PUBLIC_IP}${PORT_SUFFIX}/admin/${C_RESET}"
+  echo -e "${C_BOLD}API:${C_RESET}    ${C_BLUE}http://${PUBLIC_IP}${PORT_SUFFIX}/healthz${C_RESET}"
+fi
 echo
 echo -e "${C_BOLD}Admin bootstrap token:${C_RESET}"
 echo -e "  ${C_YELLOW}${ADMIN_TOKEN}${C_RESET}"

@@ -24,7 +24,7 @@ services:
       db:
         condition: service_healthy
     ports:
-      - "${KIVANA_HTTP_PORT:-8080}:8080"
+      - "${KIVANA_BIND_IP:-0.0.0.0}:${KIVANA_HTTP_PORT:-8080}:8080"
     restart: unless-stopped
 
 volumes:

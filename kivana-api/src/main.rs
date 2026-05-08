@@ -230,9 +230,20 @@ async fn main() -> anyhow::Result<()> {
         .route("/v1/portal/select-plan", post(portal_select_plan))
         .route("/v1/events/poll", get(poll_events))
         .route("/admin", get(|| async { Redirect::permanent("/admin/") }))
-        .nest_service("/admin/", ServeDir::new("kivana-admin"))
-        .route("/", get(|| async { Redirect::permanent("/portal/") }))
-        .nest_service("/portal/", ServeDir::new("kivana-portal"))
+        .nest_service(
+            "/admin/",
+            ServeDir::new("kivana-admin").append_index_html_on_directories(true),
+        )
+        .route("/portal", get(|| async { Redirect::permanent("/") }))
+        .route("/portal/", get(|| async { Redirect::permanent("/") }))
+        .nest_service(
+            "/portal/",
+            ServeDir::new("kivana-portal").append_index_html_on_directories(true),
+        )
+        .nest_service(
+            "/",
+            ServeDir::new("kivana-portal").append_index_html_on_directories(true),
+        )
         .layer(cors)
         .layer(TraceLayer::new_for_http())
         .with_state(state);
